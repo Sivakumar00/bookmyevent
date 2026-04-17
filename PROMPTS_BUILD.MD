@@ -22,3 +22,10 @@ wait for next prompt after the completing the steps. Stop and clarify if you hav
    - check the nest js api routes and update the routes in the spec file.
    - Check all the params, payload and query changes
    - After the updation, check whether the spec is valid
+
+## Setup Database:
+
+- Install typeorm latest and setup into nest js project
+- setup postgres db
+- setup migration in typeorm along with migration commands
+- Turn off auto creation table, tables should be created only by migration scripts. not by typeorm sync
