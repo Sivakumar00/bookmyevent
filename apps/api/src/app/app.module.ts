@@ -4,21 +4,22 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppService } from './app.service';
 import { AppController } from './app.controller';
 import { databaseConfig } from '../config/database.config';
-import { User } from '../entities/user.entity';
 import { Venue } from '../entities/venue.entity';
 import { Event } from '../entities/event.entity';
 import { Ticket } from '../entities/ticket.entity';
-import { Order } from '../entities/order.entity';
-import { OrderItem } from '../entities/order-item.entity';
+import { Booking } from '../entities/booking.entity';
+import { BookingItem } from '../entities/booking-item.entity';
 import { MigrationRunner } from '../migrations/migration.service';
+import { VenuesModule } from '../venues/venues.module';
 
 @Module({
   imports: [
     TypeOrmModule.forRoot({
       ...databaseConfig,
-      entities: [User, Venue, Event, Ticket, Order, OrderItem],
+      entities: [Venue, Event, Ticket, Booking, BookingItem],
     }),
-    TypeOrmModule.forFeature([User, Venue, Event, Ticket, Order, OrderItem]),
+    TypeOrmModule.forFeature([Venue, Event, Ticket, Booking, BookingItem]),
+    VenuesModule,
   ],
   controllers: [AppController],
   providers: [AppService, MigrationRunner],

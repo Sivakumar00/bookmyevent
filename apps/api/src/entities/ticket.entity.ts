@@ -7,7 +7,6 @@ import {
   JoinColumn,
 } from 'typeorm';
 
-import { User } from './user.entity';
 import { Event } from './event.entity';
 
 export enum TicketType {
@@ -27,8 +26,8 @@ export class Ticket {
   @Column({ name: 'event_id' })
   eventId!: string;
 
-  @Column({ type: 'enum', enum: TicketType })
-  type!: TicketType;
+  @Column({ type: 'varchar', default: 'REGULAR' })
+  type!: string;
 
   @Column({ type: 'decimal', precision: 10, scale: 2 })
   price!: number;
@@ -41,8 +40,4 @@ export class Ticket {
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt!: Date;
-
-  @ManyToOne(() => User, (user) => user.tickets)
-  @JoinColumn({ name: 'created_by' })
-  createdBy!: User;
 }

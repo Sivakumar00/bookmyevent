@@ -8,7 +8,6 @@ import {
   JoinColumn,
 } from 'typeorm';
 
-import { User } from './user.entity';
 import { Venue } from './venue.entity';
 import { Ticket } from './ticket.entity';
 
@@ -42,15 +41,11 @@ export class Event {
   @Column({ name: 'venue_id' })
   venueId!: string;
 
-  @Column({ type: 'enum', enum: EventStatus, default: EventStatus.DRAFT })
-  status!: EventStatus;
+  @Column({ type: 'varchar', default: 'DRAFT' })
+  status!: string;
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt!: Date;
-
-  @ManyToOne(() => User, (user) => user.events)
-  @JoinColumn({ name: 'created_by' })
-  createdBy!: User;
 
   @OneToMany(() => Ticket, (ticket) => ticket.event)
   tickets!: Ticket[];

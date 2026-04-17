@@ -20,11 +20,13 @@
   "dependencies": {
     "@nestjs/common": "^11.1.11",
     "@nestjs/core": "^11.1.11",
+    "@nestjs/mapped-types": "*",
     "@nestjs/platform-express": "^11.1.11",
     "@nestjs/swagger": "^11.3.0",
     "@nestjs/typeorm": "^11.0.1",
     "@repo/api": "workspace:*",
     "escape-html": "^1.0.3",
+    "joi": "^18.1.2",
     "pg": "^8.20.0",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.2",

@@ -6,20 +6,20 @@ import {
   JoinColumn,
 } from 'typeorm';
 
-import { Order } from './order.entity';
+import { Booking } from './booking.entity';
 import { Ticket } from './ticket.entity';
 
-@Entity('order_items')
-export class OrderItem {
+@Entity('booking_items')
+export class BookingItem {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
-  @ManyToOne(() => Order, (order) => order.items)
-  @JoinColumn({ name: 'order_id' })
-  order!: Order;
+  @ManyToOne(() => Booking, (booking) => booking.items)
+  @JoinColumn({ name: 'booking_id' })
+  booking!: Booking;
 
-  @Column({ name: 'order_id' })
-  orderId!: string;
+  @Column({ name: 'booking_id' })
+  bookingId!: string;
 
   @ManyToOne(() => Ticket)
   @JoinColumn({ name: 'ticket_id' })
