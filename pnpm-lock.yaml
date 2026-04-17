@@ -58,6 +58,9 @@ importers:
       rxjs:
         specifier: ^7.8.2
         version: 7.8.2
+      typeorm:
+        specifier: ^0.3.28
+        version: 0.3.28(pg@8.20.0)(ts-node@10.9.2)
     devDependencies:
       '@jest/globals':
         specifier: ^30.2.0
@@ -116,9 +119,6 @@ importers:
       tsconfig-paths:
         specifier: ^4.2.0
         version: 4.2.0
-      typeorm:
-        specifier: ^0.3.28
-        version: 0.3.28(pg@8.20.0)(ts-node@10.9.2)
       typescript:
         specifier: 5.5.4
         version: 5.5.4
@@ -2725,6 +2725,7 @@ packages:
       {
         integrity: sha512-Uy0+khmZqUrUGm5dmMqVlnvufZRSK0FbYzVgp0UMstm+F5+W2/jnEEQyc9vo1ZR/E5ZI/B1WjjoTqBqwJL6Krw==,
       }
+    dev: false
 
   /@swc/helpers@0.5.15:
     resolution:
@@ -3961,6 +3962,7 @@ packages:
         integrity: sha512-biN3PwB2gUtjaYy/isrU3aNWI5w+fAfvHkSvCKeQGxhmYpwKFUxudR3Yya+KqVRHBmEDYh+/lTozYCFbmzX4nA==,
       }
     engines: { node: '>= 6.0.0' }
+    dev: false
 
   /append-field@1.0.0:
     resolution:
@@ -4379,6 +4381,7 @@ packages:
     dependencies:
       base64-js: 1.5.1
       ieee754: 1.2.1
+    dev: false
 
   /busboy@1.6.0:
     resolution:
@@ -4868,6 +4871,7 @@ packages:
       {
         integrity: sha512-YbwwqR/uYpeoP4pu043q+LTDLFBLApUP6VxRihdfNTqu4ubqMlGDLd6ErXhEgsyvY0K6nCs7nggYumAN+9uEuQ==,
       }
+    dev: false
 
   /debug@4.4.3:
     resolution:
@@ -5015,6 +5019,7 @@ packages:
         integrity: sha512-uBq4egWHTcTt33a72vpSG0z3HnPuIl6NqYcTrKEg2azoEyl2hpW0zqlxysq2pK9HlDIHyHyakeYaYnSAwd8bow==,
       }
     engines: { node: '>=12' }
+    dev: false
 
   /dunder-proto@1.0.1:
     resolution:
@@ -8489,6 +8494,7 @@ packages:
         integrity: sha512-6lswVVSztmHiRtD6I8hw4qP/nDm1EJbKMRhf3HCYaqud7frGysPv7FYJ5noZQdhQtN2xJnimfMtvQq21pdbzyQ==,
       }
     requiresBuild: true
+    dev: false
     optional: true
 
   /pg-connection-string@2.12.0:
@@ -8496,6 +8502,7 @@ packages:
       {
         integrity: sha512-U7qg+bpswf3Cs5xLzRqbXbQl85ng0mfSV/J0nnA31MCLgvEaAo7CIhmeyrmJpOr7o+zm0rXK+hNnT5l9RHkCkQ==,
       }
+    dev: false
 
   /pg-int8@1.0.1:
     resolution:
@@ -8513,6 +8520,7 @@ packages:
       pg: '>=8.0'
     dependencies:
       pg: 8.20.0
+    dev: false
 
   /pg-protocol@1.13.0:
     resolution:
@@ -8552,6 +8560,7 @@ packages:
       pgpass: 1.0.5
     optionalDependencies:
       pg-cloudflare: 1.3.0
+    dev: false
 
   /pgpass@1.0.5:
     resolution:
@@ -8560,6 +8569,7 @@ packages:
       }
     dependencies:
       split2: 4.2.0
+    dev: false
 
   /picocolors@1.1.1:
     resolution:
@@ -9219,6 +9229,7 @@ packages:
       inherits: 2.0.4
       safe-buffer: 5.2.1
       to-buffer: 1.2.2
+    dev: false
 
   /sharp@0.34.5:
     resolution:
@@ -9425,6 +9436,7 @@ packages:
         integrity: sha512-UcjcJOWknrNkF6PLX83qcHM6KHgVKNkV62Y8a5uYDVv9ydGQVwAHMKqHdJje1VTWpljG0WYpCDhrCdAOYH4TWg==,
       }
     engines: { node: '>= 10.x' }
+    dev: false
 
   /sprintf-js@1.0.3:
     resolution:
@@ -9439,6 +9451,7 @@ packages:
         integrity: sha512-ed7OK4e9ywpE7pgRMkMQmZDPKSVdm0oX5IEtZiKnFucSF0zu6c80GZBe38UqHuVhTWJ9xsKgSMjCG2bml86KvA==,
       }
     engines: { node: '>=14' }
+    dev: false
 
   /stack-utils@2.0.6:
     resolution:
@@ -9932,6 +9945,7 @@ packages:
       isarray: 2.0.5
       safe-buffer: 5.2.1
       typed-array-buffer: 1.0.3
+    dev: false
 
   /to-regex-range@5.0.1:
     resolution:
@@ -10343,6 +10357,7 @@ packages:
     transitivePeerDependencies:
       - babel-plugin-macros
       - supports-color
+    dev: false
 
   /typescript-eslint@8.46.4(eslint@9.39.1)(typescript@5.8.2):
     resolution:
@@ -10533,6 +10548,7 @@ packages:
         integrity: sha512-0/A9rDy9P7cJ+8w1c9WD9V//9Wj15Ce2MPz8Ri6032usz+NfePxx5AcN3bN+r6ZL6jEo066/yNYB3tn4pQEx+A==,
       }
     hasBin: true
+    dev: false
 
   /v8-compile-cache-lib@3.0.1:
     resolution:

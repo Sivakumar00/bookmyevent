@@ -10,6 +10,7 @@ import { Event } from '../entities/event.entity';
 import { Ticket } from '../entities/ticket.entity';
 import { Order } from '../entities/order.entity';
 import { OrderItem } from '../entities/order-item.entity';
+import { MigrationRunner } from '../migrations/migration.service';
 
 @Module({
   imports: [
@@ -20,6 +21,6 @@ import { OrderItem } from '../entities/order-item.entity';
     TypeOrmModule.forFeature([User, Venue, Event, Ticket, Order, OrderItem]),
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, MigrationRunner],
 })
 export class AppModule {}
