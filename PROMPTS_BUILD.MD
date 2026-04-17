@@ -13,3 +13,12 @@ Steps:
 3. Setup the jest UT setup
 
 wait for next prompt after the completing the steps. Stop and clarify if you have any doubt for this whole session.
+
+## OpenAPI Spec setup
+
+1. Setup openAPI spec 3.x .yaml file
+2. Setup swagger ui with nestjs
+3. Update openapi.yaml:
+   - check the nest js api routes and update the routes in the spec file.
+   - Check all the params, payload and query changes
+   - After the updation, check whether the spec is valid
