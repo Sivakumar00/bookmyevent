@@ -7,7 +7,10 @@
     "incremental": false,
     "outDir": "dist",
     "types": ["node"],
-    "strictNullChecks": true
+    "strictNullChecks": true,
+    "paths": {
+      "@bookmyevent/errors": ["../../packages/errors/src/index.ts"]
+    }
   },
   "include": ["src"],
   "exclude": ["node_modules", "test", "dist", "**/*spec.ts"]

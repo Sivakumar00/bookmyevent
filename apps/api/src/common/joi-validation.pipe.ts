@@ -1,10 +1,6 @@
-import {
-  PipeTransform,
-  Injectable,
-  ArgumentMetadata,
-  BadRequestException,
-} from '@nestjs/common';
+import { PipeTransform, Injectable, ArgumentMetadata } from '@nestjs/common';
 import Joi from 'joi';
+import { BadRequestError } from '../shared/errors';
 
 @Injectable()
 export class JoiValidationPipe implements PipeTransform {
@@ -16,7 +12,7 @@ export class JoiValidationPipe implements PipeTransform {
       const errorMessage = error.details
         .map((detail) => detail.message)
         .join(', ');
-      throw new BadRequestException(errorMessage);
+      throw new BadRequestError(errorMessage);
     }
     return validatedValue;
   }

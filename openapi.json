@@ -1,0 +1,502 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "BookMyEvent API",
+    "description": "Ticketing system API for event organisers to create & manage events.\nUsers can purchase/reserve tickets for events.\n",
+    "version": "1.0.0",
+    "contact": {
+      "name": "API Support",
+      "email": "support@bookmyevent.com"
+    }
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3000",
+      "description": "Development server"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Venues",
+      "description": "Venue management endpoints"
+    },
+    {
+      "name": "App",
+      "description": "Application health check"
+    }
+  ],
+  "paths": {
+    "/": {
+      "get": {
+        "operationId": "AppController_getHello",
+        "summary": "Root endpoint",
+        "description": "Returns a greeting message to verify the API is running",
+        "tags": ["App"],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "data": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": {
+                  "success": true,
+                  "data": "Hello World"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/venues": {
+      "post": {
+        "operationId": "VenuesController_create",
+        "summary": "Create a new venue",
+        "description": "Creates a new venue with the provided details",
+        "tags": ["Venues"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateVenueDto"
+              },
+              "example": {
+                "name": "Convention Center",
+                "location": "123 Main Street, City",
+                "capacity": 500
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Venue created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                },
+                "example": {
+                  "success": true,
+                  "data": {
+                    "id": "550e8400-e29b-41d4-a716-446655440000",
+                    "name": "Convention Center",
+                    "location": "123 Main Street, City",
+                    "capacity": 500,
+                    "createdAt": "2026-04-18T12:00:00.000Z"
+                  },
+                  "message": "Venue created successfully"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - invalid input data"
+          }
+        }
+      },
+      "get": {
+        "operationId": "VenuesController_findAll",
+        "summary": "Get all venues",
+        "description": "Retrieves a paginated list of venues",
+        "tags": ["Venues"],
+        "parameters": [
+          {
+            "name": "skip",
+            "in": "query",
+            "required": false,
+            "description": "Number of records to skip",
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0
+            },
+            "example": 0
+          },
+          {
+            "name": "take",
+            "in": "query",
+            "required": false,
+            "description": "Number of records to take (max 100)",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 50
+            },
+            "example": 10
+          },
+          {
+            "name": "sortBy",
+            "in": "query",
+            "required": false,
+            "description": "Sort field",
+            "schema": {
+              "type": "string",
+              "default": "createdAt"
+            },
+            "example": "createdAt"
+          },
+          {
+            "name": "sortOrder",
+            "in": "query",
+            "required": false,
+            "description": "Sort order",
+            "schema": {
+              "type": "string",
+              "enum": ["ASC", "DESC"],
+              "default": "DESC"
+            },
+            "example": "DESC"
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "required": false,
+            "description": "Search by name or location",
+            "schema": {
+              "type": "string"
+            },
+            "example": "Convention"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of venues retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginatedResponse"
+                },
+                "example": {
+                  "success": true,
+                  "data": [
+                    {
+                      "id": "550e8400-e29b-41d4-a716-446655440000",
+                      "name": "Convention Center",
+                      "location": "123 Main Street, City",
+                      "capacity": 500,
+                      "createdAt": "2026-04-18T12:00:00.000Z"
+                    },
+                    {
+                      "id": "550e8400-e29b-41d4-a716-446655440001",
+                      "name": "City Hall",
+                      "location": "456 Downtown Ave",
+                      "capacity": 200,
+                      "createdAt": "2026-04-18T11:00:00.000Z"
+                    }
+                  ],
+                  "pagination": {
+                    "skip": 0,
+                    "take": 10,
+                    "total": 2
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/venues/{id}": {
+      "get": {
+        "operationId": "VenuesController_findOne",
+        "summary": "Get a venue by ID",
+        "description": "Retrieves a specific venue by its unique identifier",
+        "tags": ["Venues"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "Unique identifier of the venue",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "example": "550e8400-e29b-41d4-a716-446655440000"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Venue found and returned",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                },
+                "example": {
+                  "success": true,
+                  "data": {
+                    "id": "550e8400-e29b-41d4-a716-446655440000",
+                    "name": "Convention Center",
+                    "location": "123 Main Street, City",
+                    "capacity": 500,
+                    "createdAt": "2026-04-18T12:00:00.000Z"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Venue not found"
+          }
+        }
+      },
+      "patch": {
+        "operationId": "VenuesController_update",
+        "summary": "Update a venue",
+        "description": "Partially updates an existing venue with new data",
+        "tags": ["Venues"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "Unique identifier of the venue to update",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "example": "550e8400-e29b-41d4-a716-446655440000"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateVenueDto"
+              },
+              "example": {
+                "name": "Updated Convention Center",
+                "capacity": 600
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Venue updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                },
+                "example": {
+                  "success": true,
+                  "data": {
+                    "id": "550e8400-e29b-41d4-a716-446655440000",
+                    "name": "Updated Convention Center",
+                    "location": "123 Main Street, City",
+                    "capacity": 600,
+                    "createdAt": "2026-04-18T12:00:00.000Z"
+                  },
+                  "message": "Venue updated successfully"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Venue not found"
+          }
+        }
+      },
+      "delete": {
+        "operationId": "VenuesController_remove",
+        "summary": "Delete a venue",
+        "description": "Removes a venue from the system permanently",
+        "tags": ["Venues"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "Unique identifier of the venue to delete",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "example": "550e8400-e29b-41d4-a716-446655440000"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Venue deleted successfully"
+          },
+          "404": {
+            "description": "Venue not found"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "CreateVenueDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Venue name",
+            "minLength": 1,
+            "maxLength": 255,
+            "example": "Convention Center"
+          },
+          "location": {
+            "type": "string",
+            "description": "Venue location address",
+            "example": "123 Main Street, City"
+          },
+          "capacity": {
+            "type": "integer",
+            "description": "Venue capacity",
+            "minimum": 1,
+            "example": 500
+          }
+        },
+        "required": ["name", "location", "capacity"]
+      },
+      "UpdateVenueDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Updated venue name",
+            "minLength": 1,
+            "maxLength": 255,
+            "example": "Updated Convention Center"
+          },
+          "location": {
+            "type": "string",
+            "description": "Updated venue location",
+            "example": "456 New Street, City"
+          },
+          "capacity": {
+            "type": "integer",
+            "description": "Updated venue capacity",
+            "minimum": 1,
+            "example": 600
+          }
+        }
+      },
+      "Venue": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Unique identifier",
+            "example": "550e8400-e29b-41d4-a716-446655440000"
+          },
+          "name": {
+            "type": "string",
+            "description": "Venue name",
+            "example": "Convention Center"
+          },
+          "location": {
+            "type": "string",
+            "description": "Venue location",
+            "example": "123 Main Street, City"
+          },
+          "capacity": {
+            "type": "integer",
+            "description": "Venue capacity",
+            "example": 500
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Creation timestamp",
+            "example": "2026-04-18T12:00:00.000Z"
+          }
+        },
+        "required": ["id", "name", "location", "capacity", "createdAt"]
+      },
+      "ApiResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "data": {
+            "type": "object",
+            "description": "Response data"
+          },
+          "message": {
+            "type": "string",
+            "description": "Response message",
+            "example": "Venue created successfully"
+          }
+        }
+      },
+      "ApiError": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": false
+          },
+          "error": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "string"
+              },
+              "message": {
+                "type": "string"
+              },
+              "details": {
+                "type": "object"
+              }
+            }
+          }
+        }
+      },
+      "PaginatedResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Venue"
+            }
+          },
+          "pagination": {
+            "type": "object",
+            "properties": {
+              "skip": {
+                "type": "integer",
+                "example": 0
+              },
+              "take": {
+                "type": "integer",
+                "example": 10
+              },
+              "total": {
+                "type": "integer",
+                "example": 2
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

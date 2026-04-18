@@ -6,16 +6,20 @@ import {
   Patch,
   Param,
   Delete,
+  Query,
   ParseUUIDPipe,
   UsePipes,
   HttpCode,
   HttpStatus,
+  Req,
 } from '@nestjs/common';
+import type { Request } from 'express';
 
 import { VenuesService } from './venues.service';
 import { CreateVenueDto, UpdateVenueDto } from './venue.dto';
 import { JoiValidationPipe } from '../common/joi-validation.pipe';
-import { ApiResponse } from '../common/base-response';
+import { ApiResponse, PaginatedResponse } from '../common/base-response';
+import { PaginationQueryDto } from '../common/pagination.dto';
 import { createVenueSchema, updateVenueSchema } from './venue.validation';
 
 @Controller('venues')
@@ -31,9 +35,10 @@ export class VenuesController {
   }
 
   @Get()
-  async findAll() {
-    const venues = await this.venuesService.findAll();
-    return new ApiResponse(venues);
+  async findAll(@Query() pagination: PaginationQueryDto) {
+    const { data, total } = await this.venuesService.findAll(pagination);
+    const { skip = 0, take = 50 } = pagination;
+    return new PaginatedResponse(data, skip, take, total);
   }
 
   @Get(':id')
@@ -43,12 +48,13 @@ export class VenuesController {
   }
 
   @Patch(':id')
-  @UsePipes(new JoiValidationPipe(updateVenueSchema))
-  async update(
-    @Param('id', ParseUUIDPipe) id: string,
-    @Body() updateVenueDto: UpdateVenueDto,
-  ) {
-    const venue = await this.venuesService.update(id, updateVenueDto);
+  async update(@Param('id', ParseUUIDPipe) id: string, @Req() req: Request) {
+    const pipe = new JoiValidationPipe(updateVenueSchema);
+    const updateVenueDto = pipe.transform(req.body, { type: 'body' } as never);
+    const venue = await this.venuesService.update(
+      id,
+      updateVenueDto as UpdateVenueDto,
+    );
     return new ApiResponse(venue, 'Venue updated successfully');
   }
 

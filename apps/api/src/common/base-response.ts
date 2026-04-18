@@ -28,20 +28,18 @@ export class PaginatedResponse<T> {
   success: boolean;
   data: T[];
   pagination: {
-    page: number;
-    limit: number;
+    skip: number;
+    take: number;
     total: number;
-    totalPages: number;
   };
 
-  constructor(data: T[], page: number, limit: number, total: number) {
+  constructor(data: T[], skip: number, take: number, total: number) {
     this.success = true;
     this.data = data;
     this.pagination = {
-      page,
-      limit,
+      skip,
+      take,
       total,
-      totalPages: Math.ceil(total / limit),
     };
   }
 }
