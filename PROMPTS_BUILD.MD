@@ -29,3 +29,10 @@ wait for next prompt after the completing the steps. Stop and clarify if you hav
 - setup postgres db
 - setup migration in typeorm along with migration commands
 - Turn off auto creation table, tables should be created only by migration scripts. not by typeorm sync
+
+## Setup Validator & logger:
+
+- Setup Joi validator for request validation
+- Write a global error handler for handling API error
+- Create logger service to track the API routes with activity Id
+-

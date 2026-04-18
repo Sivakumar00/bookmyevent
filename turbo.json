@@ -12,6 +12,7 @@
     },
     "lint": {},
     "test": {},
+    "test:coverage": {},
     "test:e2e": {}
   }
 }

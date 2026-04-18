@@ -2,10 +2,10 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
-import { Venue } from '../entities/venue.entity';
-import { CreateVenueDto, UpdateVenueDto } from './venue.dto';
-import { PaginationQueryDto, SortOrder } from '../common/pagination.dto';
-import { NotFoundError } from '../shared/errors';
+import { Venue } from '../../entities/venue.entity';
+import { CreateVenueDto, UpdateVenueDto } from './venues.dto';
+import { PaginationQueryDto, SortOrder } from '../../common/pagination.dto';
+import { NotFoundError } from '../../shared/errors';
 
 @Injectable()
 export class VenuesService {

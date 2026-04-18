@@ -16,11 +16,11 @@ import {
 import type { Request } from 'express';
 
 import { VenuesService } from './venues.service';
-import { CreateVenueDto, UpdateVenueDto } from './venue.dto';
-import { JoiValidationPipe } from '../common/joi-validation.pipe';
-import { ApiResponse, PaginatedResponse } from '../common/base-response';
-import { PaginationQueryDto } from '../common/pagination.dto';
-import { createVenueSchema, updateVenueSchema } from './venue.validation';
+import { CreateVenueDto, UpdateVenueDto } from './venues.dto';
+import { JoiValidationPipe } from '../../common/joi-validation.pipe';
+import { ApiResponse, PaginatedResponse } from '../../common/base-response';
+import { PaginationQueryDto } from '../../common/pagination.dto';
+import { createVenueSchema, updateVenueSchema } from './venues.validation';
 
 @Controller('venues')
 export class VenuesController {

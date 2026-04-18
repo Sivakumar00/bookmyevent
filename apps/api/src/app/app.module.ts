@@ -10,7 +10,7 @@ import { Ticket } from '../entities/ticket.entity';
 import { Booking } from '../entities/booking.entity';
 import { BookingItem } from '../entities/booking-item.entity';
 import { MigrationRunner } from '../migrations/migration.service';
-import { VenuesModule } from '../venues/venues.module';
+import { VenuesModule } from '../routes/venues/venues.module';
 
 @Module({
   imports: [
