@@ -16,38 +16,24 @@
     }
   ],
   "tags": [
-    {
-      "name": "Venues",
-      "description": "Venue management endpoints"
-    },
-    {
-      "name": "App",
-      "description": "Application health check"
-    }
+    { "name": "Venues", "description": "Venue management endpoints" },
+    { "name": "Events", "description": "Event management endpoints" },
+    { "name": "Tickets", "description": "Ticket management endpoints" },
+    { "name": "Orders", "description": "Order management endpoints" },
+    { "name": "Seats", "description": "Seat management endpoints" },
+    { "name": "App", "description": "Application health check" }
   ],
   "paths": {
     "/": {
       "get": {
         "operationId": "AppController_getHello",
         "summary": "Root endpoint",
-        "description": "Returns a greeting message to verify the API is running",
         "tags": ["App"],
         "responses": {
           "200": {
             "description": "Successful response",
             "content": {
               "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "success": {
-                      "type": "boolean"
-                    },
-                    "data": {
-                      "type": "string"
-                    }
-                  }
-                },
                 "example": {
                   "success": true,
                   "data": "Hello World"
@@ -58,19 +44,17 @@
         }
       }
     },
+
     "/venues": {
       "post": {
         "operationId": "VenuesController_create",
         "summary": "Create a new venue",
-        "description": "Creates a new venue with the provided details",
         "tags": ["Venues"],
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CreateVenueDto"
-              },
+              "schema": { "$ref": "#/components/schemas/CreateVenueDto" },
               "example": {
                 "name": "Convention Center",
                 "location": "123 Main Street, City",
@@ -84,9 +68,6 @@
             "description": "Venue created successfully",
             "content": {
               "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApiResponse"
-                },
                 "example": {
                   "success": true,
                   "data": {
@@ -100,108 +81,73 @@
                 }
               }
             }
-          },
-          "400": {
-            "description": "Bad request - invalid input data"
           }
         }
       },
       "get": {
         "operationId": "VenuesController_findAll",
         "summary": "Get all venues",
-        "description": "Retrieves a paginated list of venues",
         "tags": ["Venues"],
         "parameters": [
           {
             "name": "skip",
             "in": "query",
             "required": false,
-            "description": "Number of records to skip",
-            "schema": {
-              "type": "integer",
-              "minimum": 0,
-              "default": 0
-            },
-            "example": 0
+            "schema": { "type": "integer", "default": 0 }
           },
           {
             "name": "take",
             "in": "query",
             "required": false,
-            "description": "Number of records to take (max 100)",
-            "schema": {
-              "type": "integer",
-              "minimum": 1,
-              "maximum": 100,
-              "default": 50
-            },
-            "example": 10
+            "schema": { "type": "integer", "default": 50 }
           },
           {
             "name": "sortBy",
             "in": "query",
             "required": false,
-            "description": "Sort field",
-            "schema": {
-              "type": "string",
-              "default": "createdAt"
-            },
-            "example": "createdAt"
+            "schema": { "type": "string", "default": "createdAt" }
           },
           {
             "name": "sortOrder",
             "in": "query",
             "required": false,
-            "description": "Sort order",
             "schema": {
               "type": "string",
               "enum": ["ASC", "DESC"],
               "default": "DESC"
-            },
-            "example": "DESC"
+            }
           },
           {
             "name": "search",
             "in": "query",
             "required": false,
-            "description": "Search by name or location",
-            "schema": {
-              "type": "string"
-            },
-            "example": "Convention"
+            "schema": { "type": "string" }
           }
         ],
         "responses": {
           "200": {
-            "description": "List of venues retrieved successfully",
+            "description": "List of venues",
             "content": {
               "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PaginatedResponse"
-                },
                 "example": {
                   "success": true,
                   "data": [
                     {
                       "id": "550e8400-e29b-41d4-a716-446655440000",
                       "name": "Convention Center",
-                      "location": "123 Main Street, City",
+                      "location": "123 Main Street",
                       "capacity": 500,
                       "createdAt": "2026-04-18T12:00:00.000Z"
                     },
                     {
                       "id": "550e8400-e29b-41d4-a716-446655440001",
                       "name": "City Hall",
-                      "location": "456 Downtown Ave",
+                      "location": "456 Downtown",
                       "capacity": 200,
                       "createdAt": "2026-04-18T11:00:00.000Z"
                     }
                   ],
-                  "pagination": {
-                    "skip": 0,
-                    "take": 10,
-                    "total": 2
-                  }
+                  "pagination": { "skip": 0, "take": 10, "total": 2 }
                 }
               }
             }
@@ -209,39 +155,32 @@
         }
       }
     },
+
     "/venues/{id}": {
       "get": {
         "operationId": "VenuesController_findOne",
         "summary": "Get a venue by ID",
-        "description": "Retrieves a specific venue by its unique identifier",
         "tags": ["Venues"],
         "parameters": [
           {
             "name": "id",
             "in": "path",
             "required": true,
-            "description": "Unique identifier of the venue",
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            },
+            "schema": { "type": "string", "format": "uuid" },
             "example": "550e8400-e29b-41d4-a716-446655440000"
           }
         ],
         "responses": {
           "200": {
-            "description": "Venue found and returned",
+            "description": "Venue found",
             "content": {
               "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApiResponse"
-                },
                 "example": {
                   "success": true,
                   "data": {
                     "id": "550e8400-e29b-41d4-a716-446655440000",
                     "name": "Convention Center",
-                    "location": "123 Main Street, City",
+                    "location": "123 Main Street",
                     "capacity": 500,
                     "createdAt": "2026-04-18T12:00:00.000Z"
                   }
@@ -249,26 +188,19 @@
               }
             }
           },
-          "404": {
-            "description": "Venue not found"
-          }
+          "404": { "description": "Venue not found" }
         }
       },
       "patch": {
         "operationId": "VenuesController_update",
         "summary": "Update a venue",
-        "description": "Partially updates an existing venue with new data",
         "tags": ["Venues"],
         "parameters": [
           {
             "name": "id",
             "in": "path",
             "required": true,
-            "description": "Unique identifier of the venue to update",
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            },
+            "schema": { "type": "string", "format": "uuid" },
             "example": "550e8400-e29b-41d4-a716-446655440000"
           }
         ],
@@ -276,9 +208,7 @@
           "required": true,
           "content": {
             "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UpdateVenueDto"
-              },
+              "schema": { "$ref": "#/components/schemas/UpdateVenueDto" },
               "example": {
                 "name": "Updated Convention Center",
                 "capacity": 600
@@ -291,15 +221,12 @@
             "description": "Venue updated successfully",
             "content": {
               "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApiResponse"
-                },
                 "example": {
                   "success": true,
                   "data": {
                     "id": "550e8400-e29b-41d4-a716-446655440000",
                     "name": "Updated Convention Center",
-                    "location": "123 Main Street, City",
+                    "location": "123 Main Street",
                     "capacity": 600,
                     "createdAt": "2026-04-18T12:00:00.000Z"
                   },
@@ -308,191 +235,1685 @@
               }
             }
           },
-          "404": {
-            "description": "Venue not found"
-          }
+          "404": { "description": "Venue not found" }
         }
       },
       "delete": {
         "operationId": "VenuesController_remove",
         "summary": "Delete a venue",
-        "description": "Removes a venue from the system permanently",
         "tags": ["Venues"],
         "parameters": [
           {
             "name": "id",
             "in": "path",
             "required": true,
-            "description": "Unique identifier of the venue to delete",
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            },
+            "schema": { "type": "string", "format": "uuid" },
             "example": "550e8400-e29b-41d4-a716-446655440000"
           }
         ],
         "responses": {
-          "204": {
-            "description": "Venue deleted successfully"
+          "204": { "description": "Venue deleted successfully" },
+          "404": { "description": "Venue not found" }
+        }
+      }
+    },
+
+    "/venues/{id}/seats": {
+      "get": {
+        "operationId": "VenuesController_getSeats",
+        "summary": "Get seats for a venue",
+        "tags": ["Venues"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "format": "uuid" },
+            "example": "550e8400-e29b-41d4-a716-446655440000"
           },
-          "404": {
-            "description": "Venue not found"
+          {
+            "name": "skip",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "integer", "default": 0 }
+          },
+          {
+            "name": "take",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "integer", "default": 50 }
+          },
+          {
+            "name": "sortBy",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "string", "default": "createdAt" }
+          },
+          {
+            "name": "sortOrder",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["ASC", "DESC"],
+              "default": "DESC"
+            }
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "string" }
           }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of seats",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": true,
+                  "data": [
+                    {
+                      "id": "aa0e8400-e29b-41d4-a716-446655440000",
+                      "venueId": "550e8400-e29b-41d4-a716-446655440000",
+                      "row": "A",
+                      "number": 1
+                    },
+                    {
+                      "id": "aa0e8400-e29b-41d4-a716-446655440001",
+                      "venueId": "550e8400-e29b-41d4-a716-446655440000",
+                      "row": "A",
+                      "number": 2
+                    }
+                  ],
+                  "pagination": { "skip": 0, "take": 50, "total": 150 }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "operationId": "VenuesController_createSeat",
+        "summary": "Create a seat for a venue",
+        "tags": ["Venues"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "format": "uuid" },
+            "example": "550e8400-e29b-41d4-a716-446655440000"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/VenueCreateSeatDto" },
+              "example": {
+                "row": "A",
+                "number": 1
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Seat created successfully",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": true,
+                  "data": {
+                    "id": "aa0e8400-e29b-41d4-a716-446655440000",
+                    "venueId": "550e8400-e29b-41d4-a716-446655440000",
+                    "row": "A",
+                    "number": 1
+                  },
+                  "message": "Seat created successfully"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+
+    "/venues/{id}/seats/bulk": {
+      "post": {
+        "operationId": "VenuesController_createBulkSeats",
+        "summary": "Create bulk seats for a venue",
+        "tags": ["Venues"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "format": "uuid" },
+            "example": "550e8400-e29b-41d4-a716-446655440000"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VenueCreateBulkSeatDto"
+              },
+              "example": {
+                "rows": ["A", "B", "C"],
+                "startNumber": 1,
+                "endNumber": 50
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Seats created successfully",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": true,
+                  "data": [
+                    {
+                      "id": "aa0e8400-e29b-41d4-a716-446655440000",
+                      "venueId": "550e8400-e29b-41d4-a716-446655440000",
+                      "row": "A",
+                      "number": 1
+                    },
+                    {
+                      "id": "aa0e8400-e29b-41d4-a716-446655440001",
+                      "venueId": "550e8400-e29b-41d4-a716-446655440000",
+                      "row": "A",
+                      "number": 2
+                    }
+                  ],
+                  "message": "150 seats created successfully"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+
+    "/venues/{id}/events": {
+      "get": {
+        "operationId": "VenuesController_getEvents",
+        "summary": "Get events for a venue",
+        "tags": ["Venues"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "format": "uuid" },
+            "example": "550e8400-e29b-41d4-a716-446655440000"
+          },
+          {
+            "name": "skip",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "integer", "default": 0 }
+          },
+          {
+            "name": "take",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "integer", "default": 50 }
+          },
+          {
+            "name": "sortBy",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "string", "default": "createdAt" }
+          },
+          {
+            "name": "sortOrder",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["ASC", "DESC"],
+              "default": "DESC"
+            }
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of events",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": true,
+                  "data": [
+                    {
+                      "id": "660e8400-e29b-41d4-a716-446655440000",
+                      "name": "Summer Concert 2026",
+                      "venueId": "550e8400-e29b-41d4-a716-446655440000",
+                      "status": "DRAFT"
+                    }
+                  ],
+                  "pagination": { "skip": 0, "take": 50, "total": 1 }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+
+    "/events": {
+      "post": {
+        "operationId": "EventsController_create",
+        "summary": "Create a new event",
+        "tags": ["Events"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/CreateEventDto" },
+              "example": {
+                "name": "Summer Concert 2026",
+                "description": "The biggest summer concert",
+                "startTime": "2026-06-15T18:00:00.000Z",
+                "endTime": "2026-06-15T23:00:00.000Z",
+                "venueId": "550e8400-e29b-41d4-a716-446655440000"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Event created successfully",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": true,
+                  "data": {
+                    "id": "660e8400-e29b-41d4-a716-446655440000",
+                    "name": "Summer Concert 2026",
+                    "description": "The biggest summer concert",
+                    "startTime": "2026-06-15T18:00:00.000Z",
+                    "endTime": "2026-06-15T23:00:00.000Z",
+                    "venueId": "550e8400-e29b-41d4-a716-446655440000",
+                    "status": "DRAFT",
+                    "createdAt": "2026-04-18T12:00:00.000Z"
+                  },
+                  "message": "Event created successfully"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "operationId": "EventsController_findAll",
+        "summary": "Get all events",
+        "tags": ["Events"],
+        "parameters": [
+          {
+            "name": "skip",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "integer", "default": 0 }
+          },
+          {
+            "name": "take",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "integer", "default": 50 }
+          },
+          {
+            "name": "sortBy",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "string", "default": "createdAt" }
+          },
+          {
+            "name": "sortOrder",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["ASC", "DESC"],
+              "default": "DESC"
+            }
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of events",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": true,
+                  "data": [
+                    {
+                      "id": "660e8400-e29b-41d4-a716-446655440000",
+                      "name": "Summer Concert 2026",
+                      "description": "The biggest summer concert",
+                      "startTime": "2026-06-15T18:00:00.000Z",
+                      "endTime": "2026-06-15T23:00:00.000Z",
+                      "venueId": "550e8400-e29b-41d4-a716-446655440000",
+                      "status": "DRAFT",
+                      "createdAt": "2026-04-18T12:00:00.000Z"
+                    }
+                  ],
+                  "pagination": { "skip": 0, "take": 10, "total": 1 }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+
+    "/events/{id}": {
+      "get": {
+        "operationId": "EventsController_findOne",
+        "summary": "Get an event by ID",
+        "tags": ["Events"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "format": "uuid" },
+            "example": "660e8400-e29b-41d4-a716-446655440000"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Event found",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": true,
+                  "data": {
+                    "id": "660e8400-e29b-41d4-a716-446655440000",
+                    "name": "Summer Concert 2026",
+                    "description": "The biggest summer concert",
+                    "startTime": "2026-06-15T18:00:00.000Z",
+                    "endTime": "2026-06-15T23:00:00.000Z",
+                    "venueId": "550e8400-e29b-41d4-a716-446655440000",
+                    "status": "DRAFT",
+                    "createdAt": "2026-04-18T12:00:00.000Z"
+                  }
+                }
+              }
+            }
+          },
+          "404": { "description": "Event not found" }
+        }
+      },
+      "patch": {
+        "operationId": "EventsController_update",
+        "summary": "Update an event",
+        "tags": ["Events"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "format": "uuid" },
+            "example": "660e8400-e29b-41d4-a716-446655440000"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/UpdateEventDto" },
+              "example": { "status": "PUBLISHED" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Event updated successfully",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": true,
+                  "data": {
+                    "id": "660e8400-e29b-41d4-a716-446655440000",
+                    "name": "Summer Concert 2026",
+                    "status": "PUBLISHED"
+                  },
+                  "message": "Event updated successfully"
+                }
+              }
+            }
+          },
+          "404": { "description": "Event not found" }
+        }
+      },
+      "delete": {
+        "operationId": "EventsController_remove",
+        "summary": "Delete an event",
+        "tags": ["Events"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "format": "uuid" },
+            "example": "660e8400-e29b-41d4-a716-446655440000"
+          }
+        ],
+        "responses": {
+          "204": { "description": "Event deleted successfully" },
+          "404": { "description": "Event not found" }
+        }
+      }
+    },
+
+    "/events/{id}/seats/status": {
+      "get": {
+        "operationId": "EventsController_getSeatsStatus",
+        "summary": "Get seat status for an event",
+        "tags": ["Events"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "format": "uuid" },
+            "example": "660e8400-e29b-41d4-a716-446655440000"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Seat status",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": true,
+                  "data": {
+                    "totalSeats": 150,
+                    "available": 120,
+                    "reserved": 20,
+                    "booked": 10
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+
+    "/tickets": {
+      "post": {
+        "operationId": "TicketsController_create",
+        "summary": "Create a new ticket",
+        "tags": ["Tickets"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/CreateTicketDto" },
+              "example": {
+                "eventId": "660e8400-e29b-41d4-a716-446655440000",
+                "type": "VIP",
+                "price": 150.0
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Ticket created successfully",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": true,
+                  "data": {
+                    "id": "770e8400-e29b-41d4-a716-446655440000",
+                    "eventId": "660e8400-e29b-41d4-a716-446655440000",
+                    "type": "VIP",
+                    "price": 150,
+                    "createdAt": "2026-04-18T12:00:00.000Z"
+                  },
+                  "message": "Ticket created successfully"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "operationId": "TicketsController_findAll",
+        "summary": "Get all tickets",
+        "tags": ["Tickets"],
+        "parameters": [
+          {
+            "name": "skip",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "integer", "default": 0 }
+          },
+          {
+            "name": "take",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "integer", "default": 50 }
+          },
+          {
+            "name": "sortBy",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "string", "default": "createdAt" }
+          },
+          {
+            "name": "sortOrder",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["ASC", "DESC"],
+              "default": "DESC"
+            }
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of tickets",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": true,
+                  "data": [
+                    {
+                      "id": "770e8400-e29b-41d4-a716-446655440000",
+                      "eventId": "660e8400-e29b-41d4-a716-446655440000",
+                      "type": "VIP",
+                      "price": 150,
+                      "createdAt": "2026-04-18T12:00:00.000Z"
+                    }
+                  ],
+                  "pagination": { "skip": 0, "take": 10, "total": 1 }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+
+    "/tickets/{id}": {
+      "get": {
+        "operationId": "TicketsController_findOne",
+        "summary": "Get a ticket by ID",
+        "tags": ["Tickets"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "format": "uuid" },
+            "example": "770e8400-e29b-41d4-a716-446655440000"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ticket found",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": true,
+                  "data": {
+                    "id": "770e8400-e29b-41d4-a716-446655440000",
+                    "eventId": "660e8400-e29b-41d4-a716-446655440000",
+                    "type": "VIP",
+                    "price": 150,
+                    "createdAt": "2026-04-18T12:00:00.000Z"
+                  }
+                }
+              }
+            }
+          },
+          "404": { "description": "Ticket not found" }
+        }
+      },
+      "patch": {
+        "operationId": "TicketsController_update",
+        "summary": "Update a ticket",
+        "tags": ["Tickets"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "format": "uuid" },
+            "example": "770e8400-e29b-41d4-a716-446655440000"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/UpdateTicketDto" },
+              "example": { "price": 175.0 }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Ticket updated successfully",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": true,
+                  "data": {
+                    "id": "770e8400-e29b-41d4-a716-446655440000",
+                    "price": 175
+                  },
+                  "message": "Ticket updated successfully"
+                }
+              }
+            }
+          },
+          "404": { "description": "Ticket not found" }
+        }
+      },
+      "delete": {
+        "operationId": "TicketsController_remove",
+        "summary": "Delete a ticket",
+        "tags": ["Tickets"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "format": "uuid" },
+            "example": "770e8400-e29b-41d4-a716-446655440000"
+          }
+        ],
+        "responses": {
+          "204": { "description": "Ticket deleted successfully" },
+          "404": { "description": "Ticket not found" }
+        }
+      }
+    },
+
+    "/orders": {
+      "post": {
+        "operationId": "OrdersController_create",
+        "summary": "Create a new order",
+        "tags": ["Orders"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/CreateOrderDto" },
+              "example": {
+                "userEmail": "user@example.com",
+                "seatIds": [
+                  "990e8400-e29b-41d4-a716-446655440000",
+                  "990e8400-e29b-41d4-a716-446655440001"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Order created successfully",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": true,
+                  "data": {
+                    "id": "880e8400-e29b-41d4-a716-446655440000",
+                    "userEmail": "user@example.com",
+                    "totalAmount": 300,
+                    "status": "RESERVED",
+                    "expiresAt": "2026-04-18T12:30:00.000Z",
+                    "createdAt": "2026-04-18T12:00:00.000Z"
+                  },
+                  "message": "Order reserved. Please confirm within 10 minutes."
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "operationId": "OrdersController_findAll",
+        "summary": "Get all orders",
+        "tags": ["Orders"],
+        "parameters": [
+          {
+            "name": "skip",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "integer", "default": 0 }
+          },
+          {
+            "name": "take",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "integer", "default": 50 }
+          },
+          {
+            "name": "sortBy",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "string", "default": "createdAt" }
+          },
+          {
+            "name": "sortOrder",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["ASC", "DESC"],
+              "default": "DESC"
+            }
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of orders",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": true,
+                  "data": [
+                    {
+                      "id": "880e8400-e29b-41d4-a716-446655440000",
+                      "userEmail": "user@example.com",
+                      "totalAmount": 300,
+                      "status": "RESERVED",
+                      "expiresAt": "2026-04-18T12:30:00.000Z",
+                      "createdAt": "2026-04-18T12:00:00.000Z"
+                    }
+                  ],
+                  "pagination": { "skip": 0, "take": 10, "total": 1 }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+
+    "/orders/{id}": {
+      "get": {
+        "operationId": "OrdersController_findOne",
+        "summary": "Get an order by ID",
+        "tags": ["Orders"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "format": "uuid" },
+            "example": "880e8400-e29b-41d4-a716-446655440000"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Order found",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": true,
+                  "data": {
+                    "id": "880e8400-e29b-41d4-a716-446655440000",
+                    "userEmail": "user@example.com",
+                    "totalAmount": 300,
+                    "status": "RESERVED",
+                    "expiresAt": "2026-04-18T12:30:00.000Z",
+                    "createdAt": "2026-04-18T12:00:00.000Z"
+                  }
+                }
+              }
+            }
+          },
+          "404": { "description": "Order not found" }
+        }
+      },
+      "patch": {
+        "operationId": "OrdersController_update",
+        "summary": "Update an order",
+        "tags": ["Orders"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "format": "uuid" },
+            "example": "880e8400-e29b-41d4-a716-446655440000"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/UpdateOrderDto" },
+              "example": { "status": "CONFIRMED" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Order updated successfully",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": true,
+                  "data": {
+                    "id": "880e8400-e29b-41d4-a716-446655440000",
+                    "status": "CONFIRMED"
+                  },
+                  "message": "Order updated successfully"
+                }
+              }
+            }
+          },
+          "404": { "description": "Order not found" }
+        }
+      },
+      "delete": {
+        "operationId": "OrdersController_remove",
+        "summary": "Delete an order",
+        "tags": ["Orders"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "format": "uuid" },
+            "example": "880e8400-e29b-41d4-a716-446655440000"
+          }
+        ],
+        "responses": {
+          "204": { "description": "Order deleted successfully" },
+          "404": { "description": "Order not found" }
+        }
+      }
+    },
+
+    "/orders/{id}/confirm": {
+      "post": {
+        "operationId": "OrdersController_confirm",
+        "summary": "Confirm an order",
+        "tags": ["Orders"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "format": "uuid" },
+            "example": "880e8400-e29b-41d4-a716-446655440000"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Order confirmed successfully",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": true,
+                  "data": {
+                    "id": "880e8400-e29b-41d4-a716-446655440000",
+                    "status": "CONFIRMED"
+                  },
+                  "message": "Order confirmed successfully"
+                }
+              }
+            }
+          },
+          "404": { "description": "Order not found" }
+        }
+      }
+    },
+
+    "/orders/{id}/cancel": {
+      "post": {
+        "operationId": "OrdersController_cancel",
+        "summary": "Cancel an order",
+        "tags": ["Orders"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "format": "uuid" },
+            "example": "880e8400-e29b-41d4-a716-446655440000"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Order cancelled successfully",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": true,
+                  "data": {
+                    "id": "880e8400-e29b-41d4-a716-446655440000",
+                    "status": "CANCELLED"
+                  },
+                  "message": "Order cancelled successfully"
+                }
+              }
+            }
+          },
+          "404": { "description": "Order not found" }
+        }
+      }
+    },
+
+    "/seats": {
+      "post": {
+        "operationId": "SeatsController_create",
+        "summary": "Create a new seat",
+        "tags": ["Seats"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/CreateSeatDto" },
+              "example": {
+                "eventId": "660e8400-e29b-41d4-a716-446655440000",
+                "row": "A",
+                "number": 1,
+                "ticketId": "770e8400-e29b-41d4-a716-446655440000"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Seat created successfully",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": true,
+                  "data": {
+                    "id": "990e8400-e29b-41d4-a716-446655440000",
+                    "eventId": "660e8400-e29b-41d4-a716-446655440000",
+                    "seatId": "SEAT-001",
+                    "status": "AVAILABLE",
+                    "createdAt": "2026-04-18T12:00:00.000Z"
+                  },
+                  "message": "Seat created successfully"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post/bulk": {
+        "operationId": "SeatsController_createBulk",
+        "summary": "Create multiple seats",
+        "tags": ["Seats"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/CreateBulkSeatDto" },
+              "example": {
+                "eventId": "660e8400-e29b-41d4-a716-446655440000",
+                "rows": ["A", "B", "C"],
+                "startNumber": 1,
+                "endNumber": 50,
+                "ticketId": "770e8400-e29b-41d4-a716-446655440000"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Seats created successfully",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": true,
+                  "data": [
+                    {
+                      "id": "990e8400-e29b-41d4-a716-446655440000",
+                      "eventId": "660e8400-e29b-41d4-a716-446655440000",
+                      "seatId": "SEAT-001",
+                      "status": "AVAILABLE"
+                    },
+                    {
+                      "id": "990e8400-e29b-41d4-a716-446655440001",
+                      "eventId": "660e8400-e29b-41d4-a716-446655440000",
+                      "seatId": "SEAT-002",
+                      "status": "AVAILABLE"
+                    }
+                  ],
+                  "message": "5 seats created successfully"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post/lock": {
+        "operationId": "SeatsController_lockSeats",
+        "summary": "Lock seats for booking",
+        "tags": ["Seats"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/LockSeatsDto" },
+              "example": {
+                "seatIds": [
+                  "990e8400-e29b-41d4-a716-446655440000",
+                  "990e8400-e29b-41d4-a716-446655440001"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Seats locked",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": true,
+                  "data": [
+                    {
+                      "id": "990e8400-e29b-41d4-a716-446655440000",
+                      "status": "LOCKED"
+                    },
+                    {
+                      "id": "990e8400-e29b-41d4-a716-446655440001",
+                      "status": "LOCKED"
+                    }
+                  ],
+                  "message": "Seats locked"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post/book": {
+        "operationId": "SeatsController_bookSeats",
+        "summary": "Book seats",
+        "tags": ["Seats"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/BookSeatsDto" },
+              "example": {
+                "seatIds": [
+                  "990e8400-e29b-41d4-a716-446655440000",
+                  "990e8400-e29b-41d4-a716-446655440001"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Seats booked successfully",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": true,
+                  "data": [
+                    {
+                      "id": "990e8400-e29b-41d4-a716-446655440000",
+                      "status": "BOOKED"
+                    },
+                    {
+                      "id": "990e8400-e29b-41d4-a716-446655440001",
+                      "status": "BOOKED"
+                    }
+                  ],
+                  "message": "Seats booked successfully"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post/release": {
+        "operationId": "SeatsController_releaseSeats",
+        "summary": "Release seats",
+        "tags": ["Seats"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/ReleaseSeatsDto" },
+              "example": {
+                "seatIds": [
+                  "990e8400-e29b-41d4-a716-446655440000",
+                  "990e8400-e29b-41d4-a716-446655440001"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Seats released successfully",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": true,
+                  "data": [
+                    {
+                      "id": "990e8400-e29b-41d4-a716-446655440000",
+                      "status": "AVAILABLE"
+                    },
+                    {
+                      "id": "990e8400-e29b-41d4-a716-446655440001",
+                      "status": "AVAILABLE"
+                    }
+                  ],
+                  "message": "Seats released successfully"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "operationId": "SeatsController_findAll",
+        "summary": "Get all seats",
+        "tags": ["Seats"],
+        "parameters": [
+          {
+            "name": "skip",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "integer", "default": 0 }
+          },
+          {
+            "name": "take",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "integer", "default": 50 }
+          },
+          {
+            "name": "sortBy",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "string", "default": "createdAt" }
+          },
+          {
+            "name": "sortOrder",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["ASC", "DESC"],
+              "default": "DESC"
+            }
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "eventId",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "string", "format": "uuid" },
+            "example": "660e8400-e29b-41d4-a716-446655440000"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of seats",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": true,
+                  "data": [
+                    {
+                      "id": "990e8400-e29b-41d4-a716-446655440000",
+                      "eventId": "660e8400-e29b-41d4-a716-446655440000",
+                      "seatId": "SEAT-001",
+                      "status": "AVAILABLE",
+                      "createdAt": "2026-04-18T12:00:00.000Z"
+                    }
+                  ],
+                  "pagination": { "skip": 0, "take": 10, "total": 1 }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+
+    "/seats/{id}": {
+      "get": {
+        "operationId": "SeatsController_findOne",
+        "summary": "Get a seat by ID",
+        "tags": ["Seats"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "format": "uuid" },
+            "example": "990e8400-e29b-41d4-a716-446655440000"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Seat found",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": true,
+                  "data": {
+                    "id": "990e8400-e29b-41d4-a716-446655440000",
+                    "eventId": "660e8400-e29b-41d4-a716-446655440000",
+                    "seatId": "SEAT-001",
+                    "status": "AVAILABLE",
+                    "createdAt": "2026-04-18T12:00:00.000Z"
+                  }
+                }
+              }
+            }
+          },
+          "404": { "description": "Seat not found" }
+        }
+      },
+      "patch": {
+        "operationId": "SeatsController_update",
+        "summary": "Update a seat",
+        "tags": ["Seats"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "format": "uuid" },
+            "example": "990e8400-e29b-41d4-a716-446655440000"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/UpdateSeatDto" },
+              "example": { "status": "BOOKED" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Seat updated successfully",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": true,
+                  "data": {
+                    "id": "990e8400-e29b-41d4-a716-446655440000",
+                    "status": "BOOKED"
+                  },
+                  "message": "Seat updated successfully"
+                }
+              }
+            }
+          },
+          "404": { "description": "Seat not found" }
+        }
+      },
+      "delete": {
+        "operationId": "SeatsController_remove",
+        "summary": "Delete a seat",
+        "tags": ["Seats"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "format": "uuid" },
+            "example": "990e8400-e29b-41d4-a716-446655440000"
+          }
+        ],
+        "responses": {
+          "204": { "description": "Seat deleted successfully" },
+          "404": { "description": "Seat not found" }
         }
       }
     }
   },
+
   "components": {
     "schemas": {
       "CreateVenueDto": {
         "type": "object",
         "properties": {
-          "name": {
-            "type": "string",
-            "description": "Venue name",
-            "minLength": 1,
-            "maxLength": 255,
-            "example": "Convention Center"
-          },
-          "location": {
-            "type": "string",
-            "description": "Venue location address",
-            "example": "123 Main Street, City"
-          },
-          "capacity": {
-            "type": "integer",
-            "description": "Venue capacity",
-            "minimum": 1,
-            "example": 500
-          }
+          "name": { "type": "string", "description": "Venue name" },
+          "location": { "type": "string", "description": "Venue location" },
+          "capacity": { "type": "integer", "description": "Venue capacity" }
         },
         "required": ["name", "location", "capacity"]
       },
       "UpdateVenueDto": {
         "type": "object",
         "properties": {
-          "name": {
-            "type": "string",
-            "description": "Updated venue name",
-            "minLength": 1,
-            "maxLength": 255,
-            "example": "Updated Convention Center"
-          },
-          "location": {
-            "type": "string",
-            "description": "Updated venue location",
-            "example": "456 New Street, City"
-          },
-          "capacity": {
-            "type": "integer",
-            "description": "Updated venue capacity",
-            "minimum": 1,
-            "example": 600
-          }
+          "name": { "type": "string" },
+          "location": { "type": "string" },
+          "capacity": { "type": "integer" }
         }
+      },
+      "VenueCreateSeatDto": {
+        "type": "object",
+        "properties": {
+          "row": {
+            "type": "string",
+            "description": "Seat row (e.g., 'A', 'B')"
+          },
+          "number": { "type": "integer", "description": "Seat number" }
+        },
+        "required": ["row", "number"]
+      },
+      "VenueCreateBulkSeatDto": {
+        "type": "object",
+        "properties": {
+          "rows": {
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "Array of row identifiers (e.g., ['A', 'B', 'C'])"
+          },
+          "startNumber": {
+            "type": "integer",
+            "description": "Start seat number"
+          },
+          "endNumber": { "type": "integer", "description": "End seat number" }
+        },
+        "required": ["rows", "startNumber", "endNumber"]
       },
       "Venue": {
         "type": "object",
         "properties": {
-          "id": {
+          "id": { "type": "string", "format": "uuid" },
+          "name": { "type": "string" },
+          "location": { "type": "string" },
+          "capacity": { "type": "integer" },
+          "createdAt": { "type": "string", "format": "date-time" }
+        }
+      },
+      "CreateEventDto": {
+        "type": "object",
+        "properties": {
+          "name": { "type": "string", "description": "Event name" },
+          "description": {
             "type": "string",
-            "format": "uuid",
-            "description": "Unique identifier",
-            "example": "550e8400-e29b-41d4-a716-446655440000"
+            "description": "Event description"
           },
-          "name": {
-            "type": "string",
-            "description": "Venue name",
-            "example": "Convention Center"
-          },
-          "location": {
-            "type": "string",
-            "description": "Venue location",
-            "example": "123 Main Street, City"
-          },
-          "capacity": {
-            "type": "integer",
-            "description": "Venue capacity",
-            "example": 500
-          },
-          "createdAt": {
+          "startTime": {
             "type": "string",
             "format": "date-time",
-            "description": "Creation timestamp",
-            "example": "2026-04-18T12:00:00.000Z"
+            "description": "Event start time"
+          },
+          "endTime": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Event end time"
+          },
+          "venueId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Venue ID"
+          },
+          "status": { "type": "string", "description": "Event status" }
+        },
+        "required": ["name", "startTime", "endTime", "venueId"]
+      },
+      "UpdateEventDto": {
+        "type": "object",
+        "properties": {
+          "name": { "type": "string" },
+          "description": { "type": "string" },
+          "startTime": { "type": "string", "format": "date-time" },
+          "endTime": { "type": "string", "format": "date-time" },
+          "venueId": { "type": "string", "format": "uuid" },
+          "status": {
+            "type": "string",
+            "enum": ["DRAFT", "PUBLISHED", "CANCELLED"]
+          }
+        }
+      },
+      "Event": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "format": "uuid" },
+          "name": { "type": "string" },
+          "description": { "type": "string" },
+          "startTime": { "type": "string", "format": "date-time" },
+          "endTime": { "type": "string", "format": "date-time" },
+          "venueId": { "type": "string", "format": "uuid" },
+          "status": { "type": "string" },
+          "createdAt": { "type": "string", "format": "date-time" }
+        }
+      },
+      "CreateTicketDto": {
+        "type": "object",
+        "properties": {
+          "eventId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Event ID"
+          },
+          "type": {
+            "type": "string",
+            "enum": ["VIP", "REGULAR"],
+            "description": "Ticket type"
+          },
+          "price": { "type": "number", "description": "Ticket price" }
+        },
+        "required": ["eventId", "type", "price"]
+      },
+      "UpdateTicketDto": {
+        "type": "object",
+        "properties": {
+          "type": { "type": "string", "enum": ["VIP", "REGULAR"] },
+          "price": { "type": "number" }
+        }
+      },
+      "Ticket": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "format": "uuid" },
+          "eventId": { "type": "string", "format": "uuid" },
+          "type": { "type": "string" },
+          "price": { "type": "number" },
+          "createdAt": { "type": "string", "format": "date-time" }
+        }
+      },
+      "CreateOrderDto": {
+        "type": "object",
+        "properties": {
+          "userEmail": {
+            "type": "string",
+            "format": "email",
+            "description": "User email"
+          },
+          "seatIds": {
+            "type": "array",
+            "items": { "type": "string", "format": "uuid" },
+            "description": "Array of event seat IDs to reserve"
           }
         },
-        "required": ["id", "name", "location", "capacity", "createdAt"]
+        "required": ["userEmail", "seatIds"]
+      },
+      "UpdateOrderDto": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": ["RESERVED", "CONFIRMED", "CANCELLED"]
+          }
+        }
+      },
+      "Order": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "format": "uuid" },
+          "userEmail": { "type": "string" },
+          "totalAmount": { "type": "number" },
+          "status": { "type": "string" },
+          "expiresAt": { "type": "string", "format": "date-time" },
+          "createdAt": { "type": "string", "format": "date-time" }
+        }
+      },
+      "CreateSeatDto": {
+        "type": "object",
+        "properties": {
+          "eventId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Event ID"
+          },
+          "row": {
+            "type": "string",
+            "description": "Seat row (e.g., 'A', 'B')"
+          },
+          "number": { "type": "integer", "description": "Seat number" },
+          "ticketId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Ticket type ID"
+          }
+        },
+        "required": ["eventId", "row", "number"]
+      },
+      "CreateBulkSeatDto": {
+        "type": "object",
+        "properties": {
+          "eventId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Event ID"
+          },
+          "rows": {
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "Array of row identifiers (e.g., ['A', 'B', 'C'])"
+          },
+          "startNumber": {
+            "type": "integer",
+            "description": "Start seat number"
+          },
+          "endNumber": { "type": "integer", "description": "End seat number" },
+          "ticketId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Ticket type ID"
+          }
+        },
+        "required": ["eventId", "startNumber", "endNumber"]
+      },
+      "UpdateSeatDto": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": ["AVAILABLE", "LOCKED", "BOOKED"]
+          }
+        }
+      },
+      "LockSeatsDto": {
+        "type": "object",
+        "properties": {
+          "seatIds": {
+            "type": "array",
+            "items": { "type": "string", "format": "uuid" },
+            "description": "Array of seat IDs to lock"
+          }
+        },
+        "required": ["seatIds"]
+      },
+      "BookSeatsDto": {
+        "type": "object",
+        "properties": {
+          "seatIds": {
+            "type": "array",
+            "items": { "type": "string", "format": "uuid" },
+            "description": "Array of seat IDs to book"
+          }
+        },
+        "required": ["seatIds"]
+      },
+      "ReleaseSeatsDto": {
+        "type": "object",
+        "properties": {
+          "seatIds": {
+            "type": "array",
+            "items": { "type": "string", "format": "uuid" },
+            "description": "Array of seat IDs to release"
+          }
+        },
+        "required": ["seatIds"]
+      },
+      "Seat": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "format": "uuid" },
+          "eventId": { "type": "string", "format": "uuid" },
+          "seatId": { "type": "string" },
+          "status": { "type": "string" },
+          "createdAt": { "type": "string", "format": "date-time" }
+        }
       },
       "ApiResponse": {
         "type": "object",
         "properties": {
-          "success": {
-            "type": "boolean",
-            "example": true
-          },
-          "data": {
-            "type": "object",
-            "description": "Response data"
-          },
-          "message": {
-            "type": "string",
-            "description": "Response message",
-            "example": "Venue created successfully"
-          }
-        }
-      },
-      "ApiError": {
-        "type": "object",
-        "properties": {
-          "success": {
-            "type": "boolean",
-            "example": false
-          },
-          "error": {
-            "type": "object",
-            "properties": {
-              "code": {
-                "type": "string"
-              },
-              "message": {
-                "type": "string"
-              },
-              "details": {
-                "type": "object"
-              }
-            }
-          }
+          "success": { "type": "boolean" },
+          "data": { "type": "object" },
+          "message": { "type": "string" }
         }
       },
       "PaginatedResponse": {
         "type": "object",
         "properties": {
-          "success": {
-            "type": "boolean",
-            "example": true
-          },
-          "data": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/Venue"
-            }
-          },
+          "success": { "type": "boolean" },
+          "data": { "type": "array" },
           "pagination": {
             "type": "object",
             "properties": {
-              "skip": {
-                "type": "integer",
-                "example": 0
-              },
-              "take": {
-                "type": "integer",
-                "example": 10
-              },
-              "total": {
-                "type": "integer",
-                "example": 2
-              }
+              "skip": { "type": "integer" },
+              "take": { "type": "integer" },
+              "total": { "type": "integer" }
             }
           }
         }

@@ -9,3 +9,14 @@ export class UpdateVenueDto {
   location?: string;
   capacity?: number;
 }
+
+export class CreateSeatDto {
+  row!: string;
+  number!: number;
+}
+
+export class CreateBulkSeatDto {
+  rows!: string[];
+  startNumber!: number;
+  endNumber!: number;
+}

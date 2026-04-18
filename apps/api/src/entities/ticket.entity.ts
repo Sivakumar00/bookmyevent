@@ -3,18 +3,18 @@ import {
   PrimaryGeneratedColumn,
   Column,
   CreateDateColumn,
+  UpdateDateColumn,
   ManyToOne,
+  OneToMany,
   JoinColumn,
+  Unique,
 } from 'typeorm';
 
 import { Event } from './event.entity';
-
-export enum TicketType {
-  VIP = 'VIP',
-  REGULAR = 'REGULAR',
-}
+import { EventSeat } from './event-seat.entity';
 
 @Entity('tickets')
+@Unique(['eventId', 'type'])
 export class Ticket {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
@@ -26,18 +26,18 @@ export class Ticket {
   @Column({ name: 'event_id' })
   eventId!: string;
 
-  @Column({ type: 'varchar', default: 'REGULAR' })
+  @Column({ type: 'varchar' })
   type!: string;
 
   @Column({ type: 'decimal', precision: 10, scale: 2 })
   price!: number;
 
-  @Column({ name: 'total_quantity', type: 'int' })
-  totalQuantity!: number;
-
-  @Column({ name: 'available_quantity', type: 'int' })
-  availableQuantity!: number;
-
   @CreateDateColumn({ name: 'created_at' })
   createdAt!: Date;
+
+  @UpdateDateColumn({ name: 'updated_at' })
+  updatedAt!: Date;
+
+  @OneToMany(() => EventSeat, (eventSeat) => eventSeat.ticket)
+  eventSeats!: EventSeat[];
 }

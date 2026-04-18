@@ -3,10 +3,12 @@ import {
   PrimaryGeneratedColumn,
   Column,
   CreateDateColumn,
+  UpdateDateColumn,
   OneToMany,
 } from 'typeorm';
 
 import { Event } from './event.entity';
+import { Seat } from './seat.entity';
 
 @Entity('venues')
 export class Venue {
@@ -25,6 +27,12 @@ export class Venue {
   @CreateDateColumn({ name: 'created_at' })
   createdAt!: Date;
 
+  @UpdateDateColumn({ name: 'updated_at' })
+  updatedAt!: Date;
+
   @OneToMany(() => Event, (event) => event.venue)
   events!: Event[];
+
+  @OneToMany(() => Seat, (seat) => seat.venue)
+  seats!: Seat[];
 }

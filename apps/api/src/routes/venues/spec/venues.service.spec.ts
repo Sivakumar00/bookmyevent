@@ -2,19 +2,20 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { VenuesService } from '../venues.service';
 import { Venue } from '../../../entities/venue.entity';
-import { NotFoundError } from '../../../shared/errors';
+import { NotFoundError, BadRequestError } from '../../../shared/errors';
 import { PaginationQueryDto, SortOrder } from '../../../common/pagination.dto';
 import { describe, beforeEach, it, expect, jest } from '@jest/globals';
 
 describe('VenuesService', () => {
   let service: VenuesService;
 
-  const mockVenue: Venue = {
+  const mockVenue: any = {
     id: '123e4567-e89b-12d3-a456-426614174000',
     name: 'Test Venue',
     location: 'Test Location',
     capacity: 100,
     createdAt: new Date(),
+    updatedAt: new Date(),
     events: [],
   };
 
@@ -22,7 +23,22 @@ describe('VenuesService', () => {
     create: jest.fn(),
     save: jest.fn(),
     findOne: jest.fn(),
-    createQueryBuilder: jest.fn(),
+    createQueryBuilder: jest.fn((alias?: string) => {
+      if (alias === 'venue') {
+        return {
+          innerJoin: jest.fn().mockReturnThis(),
+          where: jest.fn().mockReturnThis(),
+          getOne: jest.fn().mockResolvedValue(null as never),
+        };
+      }
+      return {
+        where: jest.fn().mockReturnThis(),
+        orderBy: jest.fn().mockReturnThis(),
+        skip: jest.fn().mockReturnThis(),
+        take: jest.fn().mockReturnThis(),
+        getManyAndCount: jest.fn().mockResolvedValue([mockVenue, 1] as never),
+      };
+    }),
     remove: jest.fn(),
   };
 
@@ -120,12 +136,31 @@ describe('VenuesService', () => {
 
   describe('remove', () => {
     it('should remove a venue', async () => {
+      mockRepository.createQueryBuilder.mockReturnValue({
+        innerJoin: jest.fn().mockReturnThis(),
+        where: jest.fn().mockReturnThis(),
+        getOne: jest.fn().mockResolvedValue({ id: '123', events: [] } as never),
+      });
       mockRepository.findOne.mockResolvedValue(mockVenue as never);
       mockRepository.remove.mockResolvedValue(mockVenue as never);
 
       await service.remove(mockVenue.id);
 
       expect(mockRepository.remove).toHaveBeenCalledWith(mockVenue);
+    });
+
+    it('should throw BadRequestError if venue has events', async () => {
+      mockRepository.createQueryBuilder.mockReturnValue({
+        innerJoin: jest.fn().mockReturnThis(),
+        where: jest.fn().mockReturnThis(),
+        getOne: jest
+          .fn()
+          .mockResolvedValue({ id: '123', events: [{ id: '1' }] } as never),
+      });
+
+      await expect(service.remove(mockVenue.id)).rejects.toThrow(
+        BadRequestError,
+      );
     });
   });
 });

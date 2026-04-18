@@ -3,6 +3,7 @@ import {
   PrimaryGeneratedColumn,
   Column,
   CreateDateColumn,
+  UpdateDateColumn,
   ManyToOne,
   OneToMany,
   JoinColumn,
@@ -10,6 +11,7 @@ import {
 
 import { Venue } from './venue.entity';
 import { Ticket } from './ticket.entity';
+import { EventSeat } from './event-seat.entity';
 
 export enum EventStatus {
   DRAFT = 'DRAFT',
@@ -22,7 +24,7 @@ export class Event {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
-  @Column({ length: 100 })
+  @Column({ length: 150 })
   name!: string;
 
   @Column({ type: 'text' })
@@ -41,12 +43,18 @@ export class Event {
   @Column({ name: 'venue_id' })
   venueId!: string;
 
-  @Column({ type: 'varchar', default: 'DRAFT' })
+  @Column({ type: 'varchar', default: EventStatus.DRAFT })
   status!: string;
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt!: Date;
 
+  @UpdateDateColumn({ name: 'updated_at' })
+  updatedAt!: Date;
+
   @OneToMany(() => Ticket, (ticket) => ticket.event)
   tickets!: Ticket[];
+
+  @OneToMany(() => EventSeat, (eventSeat) => eventSeat.event)
+  eventSeats!: EventSeat[];
 }
