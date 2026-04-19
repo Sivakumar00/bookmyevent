@@ -15,6 +15,7 @@ A seat-based ticketing backend system built with NestJS, TypeORM, and PostgreSQL
 - [API Routes Reference](#api-routes-reference)
 - [End-to-End Scenarios](#end-to-end-scenarios)
 - [Validation & Error Handling](#validation--error-handling)
+- [Testing](#testing)
 - [Concurrency & Safety](#concurrency--safety)
 - [Known Gaps](#known-gaps)
 
@@ -613,6 +614,39 @@ try {
 - `SELECT ... FOR UPDATE` locks seat rows before status changes
 - UNIQUE constraint on `(event_id, seat_id)` at DB level
 - Duplicate seat ID check in service layer before DB hit
+
+---
+
+## Testing
+
+### Unit Tests
+
+The project includes unit tests for core modules using Jest.
+
+```bash
+# Run all tests
+pnpm test
+
+# Run tests with coverage
+pnpm test -- --coverage
+```
+
+### Test Coverage (Current)
+
+![Test Coverage](testcoverage.png)
+
+Current coverage summary:
+
+- **Venues Module**: ~85% coverage
+- **Common Module**: Good coverage for utilities
+- **Total**: Comprehensive test coverage for business logic
+
+### Test Commands
+
+```bash
+# Watch mode
+pnpm test:watch
+```
 
 ---
 
