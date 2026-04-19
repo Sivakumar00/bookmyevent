@@ -2,8 +2,8 @@
 
 # Stage 1: Base
 FROM node:18-alpine AS base
-RUN apk update
-RUN apk add --no-cache libc6-compat
+# RUN apk update
+# RUN apk add --no-cache libc6-compat
 
 WORKDIR /app
 
@@ -14,7 +14,7 @@ FROM base AS builder
 COPY . .
 
 # Install pnpm and turbo globally
-RUN npm install -g pnpm turbo && \
+RUN npm install -g pnpm turbo typescript && \
     pnpm config set shamefully-hoist true
 
 # Install deps (ignore postinstall errors)
