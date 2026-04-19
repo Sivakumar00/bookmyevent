@@ -20,3 +20,7 @@ export class CreateBulkSeatDto {
   startNumber!: number;
   endNumber!: number;
 }
+
+export class DeleteBulkSeatDto {
+  seatIds!: string[];
+}

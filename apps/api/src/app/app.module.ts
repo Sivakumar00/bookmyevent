@@ -16,7 +16,6 @@ import { EventsModule } from '../routes/events/events.module';
 import { TicketsModule } from '../routes/tickets/tickets.module';
 import { OrdersModule } from '../routes/orders/orders.module';
 import { VenuesModule } from '../routes/venues/venues.module';
-import { SeatsModule } from '../routes/seats/seats.module';
 
 @Module({
   imports: [
@@ -37,7 +36,6 @@ import { SeatsModule } from '../routes/seats/seats.module';
     TicketsModule,
     OrdersModule,
     VenuesModule,
-    SeatsModule,
   ],
   controllers: [AppController],
   providers: [AppService, MigrationRunner],

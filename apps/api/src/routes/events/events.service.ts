@@ -2,7 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Event } from '../../entities/event.entity';
-import { EventSeat } from '../../entities/event-seat.entity';
+import { EventSeat, EventSeatStatus } from '../../entities/event-seat.entity';
+import { Seat } from '../../entities/seat.entity';
 import { CreateEventDto, UpdateEventDto } from './events.dto';
 import { PaginationQueryDto, SortOrder } from '../../common/pagination.dto';
 import { BadRequestError, NotFoundError } from '../../shared/errors';
@@ -20,6 +21,8 @@ export class EventsService {
     private readonly ticketRepository: Repository<Ticket>,
     @InjectRepository(EventSeat)
     private readonly eventSeatRepository: Repository<EventSeat>,
+    @InjectRepository(Seat)
+    private readonly seatRepository: Repository<Seat>,
   ) {}
 
   async create(createEventDto: CreateEventDto): Promise<Event> {
@@ -114,5 +117,70 @@ export class EventsService {
       reserved: seats.filter((s) => s.status === 'RESERVED').length,
       booked: seats.filter((s) => s.status === 'BOOKED').length,
     };
+  }
+
+  async allocateSeats(
+    eventId: string,
+    seatIds: string[],
+    ticketId: string,
+  ): Promise<EventSeat[]> {
+    await this.findOne(eventId);
+
+    const ticket = await this.ticketRepository.findOne({
+      where: { id: ticketId },
+    });
+    if (!ticket) {
+      throw new NotFoundError(`Ticket with ID "${ticketId}" not found`);
+    }
+
+    const seats = seatIds.map((seatId) => {
+      return this.eventSeatRepository.create({
+        eventId,
+        seatId,
+        ticketId,
+        status: EventSeatStatus.AVAILABLE,
+      });
+    });
+
+    try {
+      return await this.eventSeatRepository.save(seats);
+    } catch (error: any) {
+      if (error.code === '23505') {
+        throw new BadRequestError(
+          'One or more seats are already allocated to this event',
+        );
+      }
+      throw error;
+    }
+  }
+
+  async getSeatAllocations(
+    eventId: string,
+    ticketId?: string,
+  ): Promise<EventSeat[]> {
+    await this.findOne(eventId);
+    const where = { eventId };
+    if (ticketId) {
+      Object.assign(where, { ticketId });
+    }
+    return this.eventSeatRepository.find({
+      where,
+      relations: ['seat', 'ticket'],
+    });
+  }
+
+  async removeSeatAllocation(eventSeatId: string): Promise<void> {
+    const eventSeat = await this.eventSeatRepository.findOne({
+      where: { id: eventSeatId },
+    });
+    if (!eventSeat) {
+      throw new NotFoundError(
+        `Seat allocation with ID "${eventSeatId}" not found`,
+      );
+    }
+    if (eventSeat.status === EventSeatStatus.BOOKED) {
+      throw new BadRequestError('Cannot remove a booked seat allocation');
+    }
+    await this.eventSeatRepository.remove(eventSeat);
   }
 }

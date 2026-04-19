@@ -37,8 +37,14 @@ export class TicketsController {
   }
 
   @Get()
-  async findAll(@Query() pagination: PaginationQueryDto) {
-    const { data, total } = await this.ticketsService.findAll(pagination);
+  async findAll(
+    @Query() pagination: PaginationQueryDto,
+    @Query('eventId') eventId?: string,
+  ) {
+    const { data, total } = await this.ticketsService.findAll(
+      pagination,
+      eventId,
+    );
     const { skip = 0, take = 50 } = pagination;
     return new PaginatedResponse(data, skip, take, total);
   }

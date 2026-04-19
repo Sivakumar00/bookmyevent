@@ -2,15 +2,18 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Ticket } from '../../entities/ticket.entity';
+import { EventSeat, EventSeatStatus } from '../../entities/event-seat.entity';
 import { CreateTicketDto, UpdateTicketDto } from './tickets.dto';
 import { PaginationQueryDto, SortOrder } from '../../common/pagination.dto';
-import { NotFoundError } from '../../shared/errors';
+import { BadRequestError, NotFoundError } from '../../shared/errors';
 
 @Injectable()
 export class TicketsService {
   constructor(
     @InjectRepository(Ticket)
     private readonly ticketRepository: Repository<Ticket>,
+    @InjectRepository(EventSeat)
+    private readonly eventSeatRepository: Repository<EventSeat>,
   ) {}
 
   async create(createTicketDto: CreateTicketDto): Promise<Ticket> {
@@ -20,6 +23,7 @@ export class TicketsService {
 
   async findAll(
     pagination: PaginationQueryDto,
+    eventId?: string,
   ): Promise<{ data: Ticket[]; total: number }> {
     const {
       skip = 0,
@@ -31,10 +35,20 @@ export class TicketsService {
 
     const queryBuilder = this.ticketRepository.createQueryBuilder('ticket');
 
+    if (eventId) {
+      queryBuilder.where('ticket.eventId = :eventId', { eventId });
+    }
+
     if (search) {
-      queryBuilder.where('(ticket.type ILIKE :search)', {
-        search: `%${search}%`,
-      });
+      if (eventId) {
+        queryBuilder.andWhere('(ticket.type ILIKE :search)', {
+          search: `%${search}%`,
+        });
+      } else {
+        queryBuilder.where('(ticket.type ILIKE :search)', {
+          search: `%${search}%`,
+        });
+      }
     }
 
     const [data, total] = await queryBuilder
@@ -65,6 +79,17 @@ export class TicketsService {
 
   async remove(id: string): Promise<void> {
     const ticket = await this.findOne(id);
+
+    const allocatedSeats = await this.eventSeatRepository.find({
+      where: { ticketId: id },
+    });
+
+    if (allocatedSeats.length > 0) {
+      throw new BadRequestError(
+        `Cannot delete ticket which is already allocated to seats. Please remove the allocations first.`,
+      );
+    }
+
     await this.ticketRepository.remove(ticket);
   }
 }

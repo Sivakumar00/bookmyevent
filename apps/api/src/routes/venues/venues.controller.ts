@@ -20,6 +20,7 @@ import {
   CreateVenueDto,
   CreateSeatDto,
   CreateBulkSeatDto,
+  DeleteBulkSeatDto,
   UpdateVenueDto,
 } from './venues.dto';
 import { JoiValidationPipe } from '../../common/joi-validation.pipe';
@@ -111,5 +112,25 @@ export class VenuesController {
       (createBulkDto.endNumber - createBulkDto.startNumber + 1);
     await this.venuesService.createBulkSeats(id, createBulkDto);
     return new ApiResponse(null, `${count} seats created successfully`);
+  }
+
+  @Delete(':id/seats/:seatId')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async removeSeat(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Param('seatId', ParseUUIDPipe) seatId: string,
+  ) {
+    await this.venuesService.removeSeat(id, seatId);
+    return new ApiResponse(null, 'Seat deleted successfully');
+  }
+
+  @Delete(':id/seats/bulk')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async removeBulkSeats(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() deleteBulkDto: DeleteBulkSeatDto,
+  ) {
+    await this.venuesService.removeBulkSeats(id, deleteBulkDto.seatIds);
+    return new ApiResponse(null, 'Seats deleted successfully');
   }
 }

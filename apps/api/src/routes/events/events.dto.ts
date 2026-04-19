@@ -15,3 +15,15 @@ export class UpdateEventDto {
   venueId?: string;
   status?: string;
 }
+
+export class CreateSeatAllocationDto {
+  seatIds!: string[];
+  ticketId!: string;
+}
+
+export class CreateBulkSeatAllocationDto {
+  rows?: string[];
+  startNumber!: number;
+  endNumber!: number;
+  ticketId!: string;
+}

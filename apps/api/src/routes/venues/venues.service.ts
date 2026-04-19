@@ -5,6 +5,7 @@ import { Repository } from 'typeorm';
 import { Venue } from '../../entities/venue.entity';
 import { Seat } from '../../entities/seat.entity';
 import { Event } from '../../entities/event.entity';
+import { EventSeat, EventSeatStatus } from '../../entities/event-seat.entity';
 import {
   CreateVenueDto,
   CreateSeatDto,
@@ -23,6 +24,8 @@ export class VenuesService {
     private readonly seatRepository: Repository<Seat>,
     @InjectRepository(Event)
     private readonly eventRepository: Repository<Event>,
+    @InjectRepository(EventSeat)
+    private readonly eventSeatRepository: Repository<EventSeat>,
   ) {}
 
   async create(createVenueDto: CreateVenueDto): Promise<Venue> {
@@ -200,5 +203,40 @@ export class VenuesService {
     }
     const venue = await this.findOne(id);
     await this.venueRepository.remove(venue);
+  }
+
+  async removeSeat(venueId: string, seatId: string): Promise<void> {
+    const seat = await this.seatRepository.findOne({
+      where: { id: seatId, venueId },
+    });
+    if (!seat) {
+      throw new NotFoundError(
+        `Seat with ID "${seatId}" not found in this venue`,
+      );
+    }
+    const hasBookedSeats = await this.eventSeatRepository.findOne({
+      where: { seatId, status: EventSeatStatus.BOOKED },
+    });
+    if (hasBookedSeats) {
+      throw new BadRequestError(
+        `Cannot delete seat "${seat.row}${seat.number}" - it has bookings`,
+      );
+    }
+    await this.seatRepository.remove(seat);
+  }
+
+  async removeBulkSeats(venueId: string, seatIds: string[]): Promise<void> {
+    await this.findOne(venueId);
+
+    try {
+      await this.seatRepository.delete(seatIds);
+    } catch (error: any) {
+      if (error.code === '23503') {
+        throw new BadRequestError(
+          'Cannot delete seats that are allocated to events',
+        );
+      }
+      throw error;
+    }
   }
 }
