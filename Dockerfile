@@ -21,7 +21,7 @@ RUN npm install -g pnpm turbo && \
 RUN pnpm install --frozen-lockfile || true
 
 # Build
-RUN pnpm turbo run build --filter=api
+RUN pnpm turbo run build
 
 # Stage 3: Runtime
 FROM base AS runner
@@ -38,13 +38,14 @@ COPY --from=builder --chown=nodejs:nodejs /app/apps/api/dist ./apps/api/dist
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/openapi.json ./
 
-ENV NODE_ENV=production
-ENV DB_HOST=postgres
-ENV DB_PORT=5432
-ENV DB_USERNAME=postgres
-ENV DB_PASSWORD=postgres
-ENV DB_DATABASE=bookmyevent
-ENV PORT=3000
+# Environment variables - use GCP env vars with defaults
+ENV NODE_ENV=${NODE_ENV:-production}
+ENV DB_HOST=${DB_HOST:-postgres}
+ENV DB_PORT=${DB_PORT:-5432}
+ENV DB_USERNAME=${DB_USERNAME:-postgres}
+ENV DB_PASSWORD=${DB_PASSWORD:-postgres}
+ENV DB_DATABASE=${DB_DATABASE:-bookmyevent}
+ENV PORT=${PORT:-3000}
 
 EXPOSE 3000
 
