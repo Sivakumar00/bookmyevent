@@ -24,52 +24,66 @@ import {
 import { PaginationQueryDto } from '../../common/pagination.dto';
 import { createTicketSchema, updateTicketSchema } from './tickets.validation';
 
-@Controller('tickets')
+@Controller('events/:eventId/tickets')
 export class TicketsController {
   constructor(private readonly ticketsService: TicketsService) {}
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
   @UsePipes(new JoiValidationPipe(createTicketSchema))
-  async create(@Body() createTicketDto: CreateTicketDto) {
-    const ticket = await this.ticketsService.create(createTicketDto);
+  async create(
+    @Param('eventId', ParseUUIDPipe) eventId: string,
+    @Body() createTicketDto: CreateTicketDto,
+  ) {
+    const ticket = await this.ticketsService.create(eventId, createTicketDto);
     return new AppApiResponse(ticket, 'Ticket created successfully');
   }
 
   @Get()
   async findAll(
+    @Param('eventId', ParseUUIDPipe) eventId: string,
     @Query() pagination: PaginationQueryDto,
-    @Query('eventId') eventId?: string,
   ) {
     const { data, total } = await this.ticketsService.findAll(
-      pagination,
       eventId,
+      pagination,
     );
     const { skip = 0, take = 50 } = pagination;
     return new PaginatedResponse(data, skip, take, total);
   }
 
-  @Get(':id')
-  async findOne(@Param('id', ParseUUIDPipe) id: string) {
-    const ticket = await this.ticketsService.findOne(id);
+  @Get(':ticketId')
+  async findOne(
+    @Param('eventId', ParseUUIDPipe) eventId: string,
+    @Param('ticketId', ParseUUIDPipe) ticketId: string,
+  ) {
+    const ticket = await this.ticketsService.findOne(ticketId, eventId);
     return new AppApiResponse(ticket);
   }
 
-  @Patch(':id')
-  async update(@Param('id', ParseUUIDPipe) id: string, @Req() req: Request) {
+  @Patch(':ticketId')
+  async update(
+    @Param('eventId', ParseUUIDPipe) eventId: string,
+    @Param('ticketId', ParseUUIDPipe) ticketId: string,
+    @Req() req: Request,
+  ) {
     const pipe = new JoiValidationPipe(updateTicketSchema);
     const updateTicketDto = pipe.transform(req.body, { type: 'body' } as never);
     const ticket = await this.ticketsService.update(
-      id,
+      ticketId,
       updateTicketDto as UpdateTicketDto,
+      eventId,
     );
     return new AppApiResponse(ticket, 'Ticket updated successfully');
   }
 
-  @Delete(':id')
+  @Delete(':ticketId')
   @HttpCode(HttpStatus.NO_CONTENT)
-  async remove(@Param('id', ParseUUIDPipe) id: string) {
-    await this.ticketsService.remove(id);
+  async remove(
+    @Param('eventId', ParseUUIDPipe) eventId: string,
+    @Param('ticketId', ParseUUIDPipe) ticketId: string,
+  ) {
+    await this.ticketsService.remove(ticketId, eventId);
     return new AppApiResponse(null, 'Ticket deleted successfully');
   }
 }

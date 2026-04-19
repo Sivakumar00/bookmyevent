@@ -53,6 +53,21 @@ export class EventsController {
     return new AppApiResponse(event);
   }
 
+  @Get(':id/seats')
+  async getSeats(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Query() pagination: PaginationQueryDto,
+    @Query('status') status?: string,
+  ) {
+    const { data, total } = await this.eventsService.getSeats(
+      id,
+      pagination,
+      status,
+    );
+    const { skip = 0, take = 50 } = pagination;
+    return new PaginatedResponse(data, skip, take, total);
+  }
+
   @Get(':id/seats/status')
   async getSeatsStatus(@Param('id', ParseUUIDPipe) id: string) {
     const status = await this.eventsService.getSeatsStatus(id);

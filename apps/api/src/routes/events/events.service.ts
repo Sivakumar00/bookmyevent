@@ -6,7 +6,12 @@ import { EventSeat, EventSeatStatus } from '../../entities/event-seat.entity';
 import { Seat } from '../../entities/seat.entity';
 import { CreateEventDto, UpdateEventDto } from './events.dto';
 import { PaginationQueryDto, SortOrder } from '../../common/pagination.dto';
-import { BadRequestError, NotFoundError } from '../../shared/errors';
+import {
+  BadRequestError,
+  NotFoundError,
+  ConflictError,
+  UnprocessableError,
+} from '../../shared/errors';
 import { Venue } from '../../entities/venue.entity';
 import { Ticket } from '../../entities/ticket.entity';
 
@@ -86,20 +91,53 @@ export class EventsService {
     if (!event) {
       throw new NotFoundError(`Event with ID "${id}" not found`);
     }
-    /**
-     * Check whether the event has active bookings
-     */
-    const bookedTicketsCount = await this.ticketRepository
-      .createQueryBuilder('ticket')
-      .innerJoin('ticket.bookingItems', 'bookingItem')
-      .where('ticket.eventId = :eventId', { eventId: id })
-      .getCount();
+    const bookedSeatsCount = await this.eventSeatRepository.count({
+      where: { eventId: id, status: EventSeatStatus.BOOKED },
+    });
 
-    if (bookedTicketsCount > 0) {
-      throw new BadRequestError('Cannot delete an event with booked tickets');
+    if (bookedSeatsCount > 0) {
+      throw new BadRequestError(
+        'Cannot delete an event with confirmed bookings',
+      );
     }
 
     await this.eventRepository.remove(event);
+  }
+
+  async getSeats(
+    eventId: string,
+    pagination: PaginationQueryDto,
+    status?: string,
+  ): Promise<{ data: EventSeat[]; total: number }> {
+    await this.findOne(eventId);
+
+    if (
+      status &&
+      !Object.values(EventSeatStatus).includes(status as EventSeatStatus)
+    ) {
+      throw new BadRequestError(
+        `Invalid status "${status}". Must be one of: ${Object.values(EventSeatStatus).join(', ')}`,
+      );
+    }
+
+    const { skip = 0, take = 50 } = pagination;
+
+    const qb = this.eventSeatRepository
+      .createQueryBuilder('eventSeat')
+      .leftJoinAndSelect('eventSeat.seat', 'seat')
+      .leftJoinAndSelect('eventSeat.ticket', 'ticket')
+      .where('eventSeat.eventId = :eventId', { eventId })
+      .orderBy('seat.row', 'ASC')
+      .addOrderBy('seat.number', 'ASC')
+      .skip(skip)
+      .take(take);
+
+    if (status) {
+      qb.andWhere('eventSeat.status = :status', { status });
+    }
+
+    const [data, total] = await qb.getManyAndCount();
+    return { data, total };
   }
 
   async getSeatsStatus(eventId: string): Promise<{
@@ -109,13 +147,25 @@ export class EventsService {
     booked: number;
   }> {
     await this.findOne(eventId);
-    const seats = await this.eventSeatRepository.find({ where: { eventId } });
+
+    const rows: { status: string; count: string }[] =
+      await this.eventSeatRepository
+        .createQueryBuilder('es')
+        .select('es.status', 'status')
+        .addSelect('COUNT(*)', 'count')
+        .where('es.eventId = :eventId', { eventId })
+        .groupBy('es.status')
+        .getRawMany();
+
+    const counts = Object.fromEntries(
+      rows.map((r) => [r.status, Number(r.count)]),
+    );
 
     return {
-      totalSeats: seats.length,
-      available: seats.filter((s) => s.status === 'AVAILABLE').length,
-      reserved: seats.filter((s) => s.status === 'RESERVED').length,
-      booked: seats.filter((s) => s.status === 'BOOKED').length,
+      totalSeats: rows.reduce((sum, r) => sum + Number(r.count), 0),
+      available: counts[EventSeatStatus.AVAILABLE] ?? 0,
+      reserved: counts[EventSeatStatus.RESERVED] ?? 0,
+      booked: counts[EventSeatStatus.BOOKED] ?? 0,
     };
   }
 
@@ -124,13 +174,31 @@ export class EventsService {
     seatIds: string[],
     ticketId: string,
   ): Promise<EventSeat[]> {
-    await this.findOne(eventId);
+    const event = await this.findOne(eventId);
 
     const ticket = await this.ticketRepository.findOne({
       where: { id: ticketId },
     });
     if (!ticket) {
       throw new NotFoundError(`Ticket with ID "${ticketId}" not found`);
+    }
+    if (ticket.eventId !== eventId) {
+      throw new UnprocessableError(
+        `Ticket "${ticketId}" does not belong to event "${eventId}"`,
+      );
+    }
+
+    const dbSeats = await this.seatRepository.findByIds(seatIds);
+    if (dbSeats.length !== seatIds.length) {
+      const foundIds = new Set(dbSeats.map((s) => s.id));
+      const missing = seatIds.filter((id) => !foundIds.has(id));
+      throw new NotFoundError(`Seats not found: ${missing.join(', ')}`);
+    }
+    const wrongVenue = dbSeats.filter((s) => s.venueId !== event.venueId);
+    if (wrongVenue.length > 0) {
+      throw new UnprocessableError(
+        `Seats do not belong to the event's venue: ${wrongVenue.map((s) => s.id).join(', ')}`,
+      );
     }
 
     const seats = seatIds.map((seatId) => {
@@ -146,7 +214,7 @@ export class EventsService {
       return await this.eventSeatRepository.save(seats);
     } catch (error: any) {
       if (error.code === '23505') {
-        throw new BadRequestError(
+        throw new ConflictError(
           'One or more seats are already allocated to this event',
         );
       }

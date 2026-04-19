@@ -93,6 +93,10 @@ export class AppErrorFilter implements ExceptionFilter {
         return ErrorCode.UNAUTHORIZED;
       case HttpStatus.FORBIDDEN:
         return ErrorCode.FORBIDDEN;
+      case HttpStatus.CONFLICT:
+        return ErrorCode.CONFLICT;
+      case HttpStatus.UNPROCESSABLE_ENTITY:
+        return ErrorCode.VALIDATION_ERROR;
       default:
         return ErrorCode.INTERNAL_SERVER_ERROR;
     }

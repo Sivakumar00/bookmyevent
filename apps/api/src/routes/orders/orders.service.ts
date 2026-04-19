@@ -4,8 +4,14 @@ import { Repository, DataSource } from 'typeorm';
 import { Order } from '../../entities/order.entity';
 import { OrderItem } from '../../entities/order-item.entity';
 import { EventSeat, EventSeatStatus } from '../../entities/event-seat.entity';
+import { Event } from '../../entities/event.entity';
+import { Ticket } from '../../entities/ticket.entity';
 import { PaginationQueryDto, SortOrder } from '../../common/pagination.dto';
-import { NotFoundError, BadRequestError } from '../../shared/errors';
+import {
+  NotFoundError,
+  BadRequestError,
+  ConflictError,
+} from '../../shared/errors';
 import { CreateOrderDto, UpdateOrderDto } from './orders.dto';
 
 @Injectable()
@@ -17,6 +23,10 @@ export class OrdersService {
     private readonly orderItemRepository: Repository<OrderItem>,
     @InjectRepository(EventSeat)
     private readonly eventSeatRepository: Repository<EventSeat>,
+    @InjectRepository(Event)
+    private readonly eventRepository: Repository<Event>,
+    @InjectRepository(Ticket)
+    private readonly ticketRepository: Repository<Ticket>,
     private readonly dataSource: DataSource,
   ) {}
 
@@ -28,55 +38,70 @@ export class OrdersService {
     try {
       const seatIds = createOrderDto.seatIds;
 
+      const uniqueSeatIds = new Set(seatIds);
+      if (uniqueSeatIds.size !== seatIds.length) {
+        throw new ConflictError('Duplicate seats are not allowed');
+      }
+
       if (!seatIds || seatIds.length === 0) {
         throw new BadRequestError('At least one seat must be selected');
       }
 
-      // Lock seats with pessimistic write
+      // Lock seats with pessimistic write (no leftJoin to avoid FOR UPDATE on nullable)
       const seats = await queryRunner.manager
         .createQueryBuilder(EventSeat, 'seat')
         .setLock('pessimistic_write')
-        .where('seat.id IN (:...seatIds)', { seatIds })
-        .leftJoinAndSelect('seat.event', 'event')
-        .leftJoinAndSelect('seat.ticket', 'ticket')
+        .where(
+          'seat.id IN (:...seatIds) AND seat.eventId = :eventId AND seat.status = :status',
+          {
+            seatIds,
+            eventId: createOrderDto.eventId,
+            status: EventSeatStatus.AVAILABLE,
+          },
+        )
         .getMany();
 
       if (seats.length !== seatIds.length) {
-        const foundIds = seats.map((s) => s.id);
-        const missingIds = seatIds.filter((id) => !foundIds.includes(id));
-        throw new NotFoundError(`Seats not found: ${missingIds.join(', ')}`);
+        const foundIds = new Set(seats.map((s) => s.id));
+        const missingIds = seatIds.filter((id) => !foundIds.has(id));
+        throw new ConflictError(
+          `Selected seats are not available: ${missingIds.join(', ')}`,
+        );
+      }
+
+      // Fetch event for validation (no lock needed)
+      const event = await this.eventRepository.findOne({
+        where: { id: createOrderDto.eventId },
+      });
+      if (!event || event.status === 'CANCELLED') {
+        throw new BadRequestError(
+          `Cannot book seat for cancelled or invalid event`,
+        );
       }
 
       let totalAmount = 0;
       const orderItems: OrderItem[] = [];
-      const reservedSeats: EventSeat[] = [];
 
       for (const seat of seats) {
-        if (seat.status !== EventSeatStatus.AVAILABLE) {
-          throw new BadRequestError(`Seat "${seat.id}" is not available`);
-        }
-
-        if (!seat.event || seat.event.status === 'CANCELLED') {
-          throw new BadRequestError(
-            `Cannot book seat for cancelled or invalid event`,
-          );
-        }
-
         // Reserve seat
         seat.status = EventSeatStatus.RESERVED;
         const expiresAt = new Date();
         expiresAt.setMinutes(expiresAt.getMinutes() + 10);
         seat.expiresAt = expiresAt;
-        await queryRunner.manager.save(seat);
-        reservedSeats.push(seat);
+        const reservedSeat = await queryRunner.manager.save(EventSeat, seat);
 
-        // Calculate price from ticket
-        const price = seat.ticket ? Number(seat.ticket.price) : 0;
+        // Fetch ticket for price (no lock needed)
+        const ticket = seat.ticketId
+          ? await queryRunner.manager.findOne(Ticket, {
+              where: { id: seat.ticketId },
+            })
+          : null;
+        const price = ticket ? Number(ticket.price) : 0;
         totalAmount += price;
 
         orderItems.push(
           this.orderItemRepository.create({
-            eventSeatId: seat.id,
+            eventSeatId: reservedSeat.id,
             priceAtPurchase: price,
           }),
         );
@@ -90,12 +115,12 @@ export class OrdersService {
         totalAmount,
         expiresAt,
       });
-      const savedOrder = await queryRunner.manager.save(order);
+      const savedOrder = await queryRunner.manager.save(Order, order);
 
       for (const item of orderItems) {
         item.orderId = savedOrder.id;
       }
-      await queryRunner.manager.save(orderItems);
+      await queryRunner.manager.save(OrderItem, orderItems);
 
       await queryRunner.commitTransaction();
 
@@ -191,7 +216,7 @@ export class OrdersService {
 
       order.status = 'CONFIRMED';
       order.expiresAt = undefined;
-      await queryRunner.manager.save(order);
+      await queryRunner.manager.save(Order, order);
 
       await queryRunner.commitTransaction();
       return order;
@@ -239,7 +264,7 @@ export class OrdersService {
       }
 
       order.status = 'CANCELLED';
-      await queryRunner.manager.save(order);
+      await queryRunner.manager.save(Order, order);
 
       await queryRunner.commitTransaction();
 

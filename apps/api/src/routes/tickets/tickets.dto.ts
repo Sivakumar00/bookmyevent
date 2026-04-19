@@ -1,5 +1,4 @@
 export class CreateTicketDto {
-  eventId!: string;
   type!: string;
   price!: number;
 }

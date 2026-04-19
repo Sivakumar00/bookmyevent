@@ -34,3 +34,17 @@ export class BadRequestError extends AppError {
     this.name = 'BadRequestError';
   }
 }
+
+export class ConflictError extends AppError {
+  constructor(message: string, details?: unknown) {
+    super(ErrorCode.CONFLICT, message, 409, details);
+    this.name = 'ConflictError';
+  }
+}
+
+export class UnprocessableError extends AppError {
+  constructor(message: string, details?: unknown) {
+    super(ErrorCode.VALIDATION_ERROR, message, 422, details);
+    this.name = 'UnprocessableError';
+  }
+}

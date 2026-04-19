@@ -8,16 +8,21 @@ import {
   Delete,
   Query,
   ParseUUIDPipe,
+  UsePipes,
   HttpCode,
   HttpStatus,
+  Req,
 } from '@nestjs/common';
+import type { Request } from 'express';
 import { OrdersService } from './orders.service';
 import { CreateOrderDto, UpdateOrderDto } from './orders.dto';
+import { JoiValidationPipe } from '../../common/joi-validation.pipe';
 import {
   ApiResponse as AppApiResponse,
   PaginatedResponse,
 } from '../../common/base-response';
 import { PaginationQueryDto } from '../../common/pagination.dto';
+import { createOrderSchema, updateOrderSchema } from './orders.validation';
 
 @Controller('orders')
 export class OrdersController {
@@ -25,6 +30,7 @@ export class OrdersController {
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
+  @UsePipes(new JoiValidationPipe(createOrderSchema))
   async create(@Body() createOrderDto: CreateOrderDto) {
     const order = await this.ordersService.create(createOrderDto);
     return new AppApiResponse(
@@ -61,11 +67,13 @@ export class OrdersController {
   }
 
   @Patch(':id')
-  async update(
-    @Param('id', ParseUUIDPipe) id: string,
-    @Body() updateOrderDto: UpdateOrderDto,
-  ) {
-    const order = await this.ordersService.update(id, updateOrderDto);
+  async update(@Param('id', ParseUUIDPipe) id: string, @Req() req: Request) {
+    const pipe = new JoiValidationPipe(updateOrderSchema);
+    const updateOrderDto = pipe.transform(req.body, { type: 'body' } as never);
+    const order = await this.ordersService.update(
+      id,
+      updateOrderDto as UpdateOrderDto,
+    );
     return new AppApiResponse(order, 'Order updated successfully');
   }
 

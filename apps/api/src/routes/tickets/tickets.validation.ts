@@ -1,10 +1,6 @@
 import Joi from 'joi';
 
 export const createTicketSchema = Joi.object({
-  eventId: Joi.string().uuid().required().messages({
-    'string.guid': 'Event ID must be a valid UUID',
-    'any.required': 'Event ID is required',
-  }),
   type: Joi.string().required().min(1).messages({
     'string.empty': 'Ticket type is required',
     'any.required': 'Ticket type is required',

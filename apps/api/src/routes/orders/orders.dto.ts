@@ -1,5 +1,6 @@
 export class CreateOrderDto {
   userEmail!: string;
+  eventId!: string;
   seatIds!: string[];
 }
 
