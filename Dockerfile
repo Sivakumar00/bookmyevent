@@ -21,7 +21,7 @@ RUN npm install -g pnpm turbo typescript && \
 RUN pnpm install --frozen-lockfile || true
 
 # Build
-RUN pnpm turbo run build
+RUN pnpm turbo run build --filter=api
 
 # Stage 3: Runtime
 FROM base AS runner
