@@ -174,7 +174,8 @@ Client Response
 
 ### Entity Relationships
 
-<iframe width="560" height="315" src='https://dbdiagram.io/e/69e27c550aa78f6bc1ff678f/69e508d80aa78f6bc10ebb61'> </iframe>
+[DB Diagram](https://dbdiagram.io/d/bookmyevent-69e27c550aa78f6bc1ff678f)
+![DB schema diagram](./bookmyevent.png)
 
 ### Tables
 
@@ -629,9 +630,3 @@ try {
 3. **Payment Integration**
    - No payment gateway integration
    - Order total is calculated but not charged
-
----
-
-## License
-
-MIT
