@@ -95,6 +95,13 @@ export class EventsController {
     return new AppApiResponse(null, 'Seat allocation removed');
   }
 
+  @Post(':id/seat-allocation/release')
+  @HttpCode(HttpStatus.OK)
+  async releaseStaleSeats(@Param('id', ParseUUIDPipe) id: string) {
+    const released = await this.eventsService.releaseStaleSeats(id);
+    return new AppApiResponse(released, 'Stale seats released');
+  }
+
   @Patch(':id')
   async update(@Param('id', ParseUUIDPipe) id: string, @Req() req: Request) {
     const pipe = new JoiValidationPipe(updateEventSchema);

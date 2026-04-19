@@ -52,7 +52,7 @@ export class EventSeat {
   status!: string;
 
   @Column({ name: 'expires_at', type: 'timestamp', nullable: true })
-  expiresAt?: Date;
+  expiresAt?: Date | null;
 
   @Column({
     name: 'created_at',

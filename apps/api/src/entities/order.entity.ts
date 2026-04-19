@@ -31,7 +31,7 @@ export class Order {
   totalAmount!: number;
 
   @Column({ name: 'expires_at', type: 'timestamp', nullable: true })
-  expiresAt?: Date;
+  expiresAt?: Date; // end of event's end date
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt!: Date;

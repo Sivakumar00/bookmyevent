@@ -183,4 +183,23 @@ export class EventsService {
     }
     await this.eventSeatRepository.remove(eventSeat);
   }
+
+  async releaseStaleSeats(eventId: string): Promise<number> {
+    await this.findOne(eventId);
+    const now = new Date();
+
+    const result = await this.eventSeatRepository
+      .createQueryBuilder()
+      .update(EventSeat)
+      .set({
+        status: EventSeatStatus.AVAILABLE,
+        expiresAt: null,
+      })
+      .where('eventId = :eventId', { eventId })
+      .andWhere('status = :status', { status: EventSeatStatus.RESERVED })
+      .andWhere('expiresAt < :now', { now })
+      .execute();
+
+    return result.affected || 0;
+  }
 }
