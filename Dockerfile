@@ -16,8 +16,7 @@ COPY apps/api/package.json apps/api/
 COPY packages/*/package.json packages/
 
 # Install dependencies (skip postinstall scripts that fail in Alpine)
-RUN pnpm config set ignore-scripts true && \
-    pnpm install --frozen-lockfile
+RUN pnpm install --frozen-lockfile
 
 # Copy source code
 COPY . .
