@@ -10,7 +10,7 @@ FROM base AS builder
 WORKDIR /app
 
 # Copy package files first for dependency caching
-COPY pnpm-workspace.yaml turbo.json ./
+COPY pnpm-workspace.yaml turbo.json pnpm-lock.yaml ./
 COPY apps/api/package.json apps/api/
 COPY packages/*/package.json packages/
 
@@ -42,6 +42,9 @@ COPY --from=builder /app/packages/*/dist ./packages
 COPY --from=builder /app/openapi.json ./
 COPY --from=builder /app/turbo.json ./
 COPY --from=builder /app/pnpm-workspace.yaml ./
+COPY --from=builder /app/pnpm-lock.yaml ./
+COPY --from=builder /app/package.json ./
+
 
 # Configurable environment variables
 ENV DB_HOST=postgres
