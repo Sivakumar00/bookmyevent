@@ -3,8 +3,7 @@
 
 # Stage 1: Base
 FROM node:20-alpine AS base
-RUN corepack enable && corepack prepare pnpm@9 activation --activate
-
+RUN corepack enable && corepack prepare pnpm@9 --activate
 # Stage 2: Builder
 FROM base AS builder
 
