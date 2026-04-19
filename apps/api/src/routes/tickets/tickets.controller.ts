@@ -8,7 +8,6 @@ import {
   Delete,
   Query,
   ParseUUIDPipe,
-  UsePipes,
   HttpCode,
   HttpStatus,
   Req,
@@ -30,10 +29,10 @@ export class TicketsController {
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  @UsePipes(new JoiValidationPipe(createTicketSchema))
   async create(
     @Param('eventId', ParseUUIDPipe) eventId: string,
-    @Body() createTicketDto: CreateTicketDto,
+    @Body(new JoiValidationPipe(createTicketSchema))
+    createTicketDto: CreateTicketDto,
   ) {
     const ticket = await this.ticketsService.create(eventId, createTicketDto);
     return new AppApiResponse(ticket, 'Ticket created successfully');
