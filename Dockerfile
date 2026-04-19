@@ -16,14 +16,13 @@ COPY apps/api/package.json apps/api/
 COPY packages/*/package.json packages/
 
 # Install dependencies (skip postinstall scripts that fail in Alpine)
-RUN pnpm install --frozen-lockfile
-
+RUN pnpm config set ignore-scripts true && \
+    pnpm install --frozen-lockfile
 # Copy source code
 COPY . .
 
 # Build all packages and api
-RUN pnpm build
-
+RUN pnpm exec turbo run build
 # Stage 3: Production runner
 FROM base AS runner
 
