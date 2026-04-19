@@ -39,7 +39,6 @@ COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/openapi.json ./
 
 # Environment variables - use GCP env vars with defaults
-ENV NODE_ENV=${NODE_ENV:-production}
 ENV DB_HOST=${DB_HOST:-postgres}
 ENV DB_PORT=${DB_PORT:-5432}
 ENV DB_USERNAME=${DB_USERNAME:-postgres}
