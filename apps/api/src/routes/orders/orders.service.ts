@@ -62,10 +62,8 @@ export class OrdersService {
         .getMany();
 
       if (seats.length !== seatIds.length) {
-        const foundIds = new Set(seats.map((s) => s.id));
-        const missingIds = seatIds.filter((id) => !foundIds.has(id));
         throw new ConflictError(
-          `Selected seats are not available: ${missingIds.join(', ')}`,
+          `Selected seats are not available. Please select a different seats`,
         );
       }
 
