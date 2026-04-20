@@ -50,11 +50,11 @@ const mockOrder: Partial<Order> = {
   items: [mockOrderItem(SEAT_ID_1) as OrderItem],
 };
 
-const mockQbSeats = (seats: any[]) => ({
+const mockQbSeats = (seats: any[]): any => ({
   setLock: jest.fn().mockReturnThis(),
   where: jest.fn().mockReturnThis(),
   getMany: jest.fn().mockResolvedValue(seats as never),
-  getOne: jest.fn().mockResolvedValue(seats[0] ?? (null as never)),
+  getOne: jest.fn().mockResolvedValue(seats[0] as never),
 });
 
 const mockQueryRunner = {

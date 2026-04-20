@@ -1,20 +1,12 @@
-FROM node:20-alpine
-
-# Install pnpm
-RUN corepack enable && corepack prepare pnpm@9 activation --activate
-
-# Install dependencies for hot reload
-RUN apk add --no-cache tzdata
+FROM node:18-alpine
 
 WORKDIR /app
 
 # Copy package files
-COPY pnpm-workspace.yaml turbo.json ./
-COPY apps/api/package.json apps/api/
-COPY packages/*/package.json packages/
+COPY package.json package-lock.json ./
 
 # Install dependencies
-RUN pnpm install --frozen-lockfile
+RUN npm install
 
 # Copy source code
 COPY . .
@@ -22,5 +14,5 @@ COPY . .
 # Expose port
 EXPOSE 3000
 
-# Start with hot reload
-CMD ["pnpm", "dev"]
+# Start dev server with hot reload
+CMD ["npm", "run", "dev"]

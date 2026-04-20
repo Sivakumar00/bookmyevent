@@ -1,10 +1,21 @@
 # Dependencies
 node_modules
+npm-debug.log
 .pnpm-store
 
 # Build outputs
 dist
 build
+coverage
+*.tsbuildinfo
+
+# Test files
+test
+*.spec.ts
+*.e2e-spec.ts
+jest.config*
+.coverage
+.nyc_output
 
 # IDE
 .vscode
@@ -20,10 +31,6 @@ npm-debug.log*
 .env.local
 .env.*.local
 
-# Test
-coverage
-.nyc_output
-
 # Docs
 *.md
 !README.md
@@ -34,3 +41,12 @@ coverage
 *.swp
 *.swo
 *~
+
+# Git
+.git
+.gitignore
+
+# Docker (exclude from build context, not from image)
+Dockerfile*
+docker-compose*.yml
+.dockerignore

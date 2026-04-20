@@ -1,51 +1,58 @@
-# Dockerfile - Production
-
 # Stage 1: Base
 FROM node:18-alpine AS base
-# RUN apk update
-# RUN apk add --no-cache libc6-compat
 
 WORKDIR /app
 
-# Stage 2: Builder
+# Install dumb-init for proper signal handling
+RUN apk add --no-cache dumb-init
+
+# Stage 2: Dependencies
+FROM base AS deps
+
+WORKDIR /app
+
+# Copy package files
+COPY package*.json ./
+
+# Install ALL dependencies (including dev for build)
+RUN npm ci
+
+# Stage 3: Build
 FROM base AS builder
 
-# Copy all source files
+WORKDIR /app
+
+# Copy package files and node_modules from deps
+COPY package*.json ./
+COPY --from=deps /app/node_modules ./node_modules
+
+# Copy source
 COPY . .
 
-# Install pnpm and turbo globally
-RUN npm install -g pnpm turbo typescript && \
-    pnpm config set shamefully-hoist true
+# Build the application
+RUN npm run build
 
-# Install deps (ignore postinstall errors)
-RUN pnpm install --frozen-lockfile || true
-
-# Build
-RUN pnpm --filter=api run build 
-
-# Stage 3: Runtime
+# Stage 4: Production runtime
 FROM base AS runner
 
 WORKDIR /app
 
-# Security
-RUN addgroup --system --gid 1001 nodejs
-RUN adduser --system --uid 1001 nodejs
+# Create non-root user
+RUN addgroup -g 1001 -S nodejs && \
+    adduser -S nodejs -u 1001
+
+# Copy built artifacts
+COPY --from=builder --chown=nodejs:nodejs /app/dist ./dist
+COPY --from=builder --chown=nodejs:nodejs /app/node_modules ./node_modules
+COPY --from=builder --chown=nodejs:nodejs /app/openapi.json ./
+
+# Switch to non-root user
 USER nodejs
 
-# Copy artifacts
-COPY --from=builder --chown=nodejs:nodejs /app/apps/api/dist ./apps/api/dist
-COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/openapi.json ./
+# Expose port (Cloud Run expects 8080)
+EXPOSE 8080
 
-# Environment variables - use GCP env vars with defaults
-ENV DB_HOST=${DB_HOST:-postgres}
-ENV DB_PORT=${DB_PORT:-5432}
-ENV DB_USERNAME=${DB_USERNAME:-postgres}
-ENV DB_PASSWORD=${DB_PASSWORD:-postgres}
-ENV DB_DATABASE=${DB_DATABASE:-bookmyevent}
-ENV PORT=${PORT:-3000}
+# Use dumb-init to handle signals properly
+ENTRYPOINT ["dumb-init", "--"]
 
-EXPOSE 3000
-
-CMD ["node", "apps/api/dist/main.js"]
+CMD ["node", "dist/main.js"]
