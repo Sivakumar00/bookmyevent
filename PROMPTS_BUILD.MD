@@ -284,23 +284,6 @@ Explanation of key decisions (brief, not too long)
 
 ---
 
-## Implementation Summary
-
-| Phase | Component      | Files Created                                       |
-| ----- | -------------- | --------------------------------------------------- |
-| 1     | Linting        | eslint, prettier, husky configs                     |
-| 1     | OpenAPI        | openapi.json                                        |
-| 2     | Database       | typeorm config, migration service                   |
-| 2     | Entities       | 7 TypeORM entities                                  |
-| 2     | Routes         | 4 feature modules (venues, events, tickets, orders) |
-| 3     | Validators     | Joi validation pipes per module                     |
-| 3     | Error Handling | AppErrorFilter, error classes                       |
-| 3     | Logger         | RequestLoggerMiddleware with activityId             |
-| 4     | Docs           | README.md                                           |
-| 4     | Docker         | Dockerfile, docker-compose.yml                      |
-
----
-
 ## Complete Codebase Structure
 
 ```
@@ -355,13 +338,12 @@ bookmyevent/
 
 ## Key Technical Decisions
 
-1. **Monorepo**: Turborepo + pnpm workspaces
-2. **Database**: PostgreSQL + TypeORM (migrations only, no sync)
-3. **API Spec**: Hand-maintained OpenAPI 3.0 JSON
-4. **Validation**: Joi schemas per module
-5. **Error Handling**: Custom error classes + global filter
-6. **Logging**: Activity ID tracking per request
-7. **Concurrency**: Pessimistic locking + transactions
+1. **Database**: PostgreSQL + TypeORM (migrations only, no sync)
+2. **API Spec**: Hand-maintained OpenAPI 3.0 JSON
+3. **Validation**: Joi schemas per module
+4. **Error Handling**: Custom error classes + global filter
+5. **Logging**: Activity ID tracking per request
+6. **Concurrency**: Pessimistic locking + transactions
 
 ---
 
