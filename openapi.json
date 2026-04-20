@@ -11,8 +11,12 @@
   },
   "servers": [
     {
+      "url": "https://bookmyevent-1036912833933.europe-west1.run.app",
+      "description": "Cloud Dev Server"
+    },
+    {
       "url": "http://localhost:3000",
-      "description": "Development server"
+      "description": "Local Development server"
     }
   ],
   "tags": [
